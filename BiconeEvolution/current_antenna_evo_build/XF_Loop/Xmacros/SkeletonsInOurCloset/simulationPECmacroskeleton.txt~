@@ -1,0 +1,42 @@
+// This macro imports data from generationDNA.csv to XF.
+// It then generates simulations.
+// OSU GENETIS team, last revision 5/24/2018
+
+var path = "/home/radio/Documents/BiconeEvolution/current_antenna_evo_build/Evolutionary_Loop/generationDNA.csv";
+var NPOP = 10 // This stores the number of individuals we are working with.
+var freqCoefficients = 60 // This stores how many frequencies we're working with.
+var headerLines = 7 // This is how many lines come before the frequency data
+var antennaLines = 9 // This is how many lines come before the antenna data
+var file = new File(path);
+file.open(1);
+var generationDNA = file.readAll();
+var radii=[];
+var lengths=[];
+var angles=[];
+
+
+//Only take the lines with functions
+var lines = generationDNA.split('\n');
+for(var i = 0;i < lines.length;i++){
+	if(i==headerLines)
+	{
+		var frequencies = lines[i].split(",");
+	}
+    if(i>=antennaLines)
+        {
+        var params = lines[i].split(",");
+        radii[i-antennaLines]=params[0];
+        lengths[i-antennaLines]=params[1];
+		angles[i-antennaLines]=params[2];
+        Output.println(radii[i-antennaLines]);
+        Output.println(lengths[i-antennaLines]);
+		Output.println(angles[i-antennaLines]);
+        }
+}
+file.close();
+
+// set variables for length of the antennas, radius of the antennas and units for the lengths
+var antennaLength = 20;
+var antennaRadius = 5;
+var antennaAngle = 15;
+var connectorLength=1.0;
