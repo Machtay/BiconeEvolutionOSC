@@ -25,6 +25,7 @@ TotalGens=6   			## number of generations (after initial) to run through
 NPOP=4 				## number of individuals per generation; please keep this value below 99
 FREQ=60 			## frequencies being iterated over in XF (Currectly only affects the output.xmacro loop)
 NNT=10000                          ##Number of Neutrinos Thrown in AraSim   
+exp=21				#exponent for energy scale of AraSim's neutrinos
 ScaleFactor=1.0                   ##ScaleFactor used when punishing fitness scores of antennae larger than holes used in fitnessFunctoin_ARA.cpp
 #########################################################################################################################
 
@@ -248,7 +249,7 @@ do
 
 #This next line replaces the number of neutrinos thrown in our setup.txt AraSim file with what ever number you assigned NNT at the top of this program. setup_dummy.txt is a copy of setup.txt that has NNU=num_nnu (NNU is the number of neutrinos thrown. This line finds every instance of num_nnu in setup_dummy.txt and replaces it with $NNT (the number you assigned NNT above). It then pipes this information into setup.txt (and overwrites the last setup.txt file allowing the number of neutrinos thrown to be as variable changed at the top of this script instead of manually changing it in setup.txt each time. Command works the following way: sed "s/oldword/newwordReplacingOldword/" path/to/filewiththisword.txt > path/to/fileWeAreOverwriting.txt
 
-        sed "s/num_nnu/$NNT/" /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup_dummy.txt > /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup.txt
+        sed -e "s/num_nnu/$NNT/" -e "/s/exp/$exp/" /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup_dummy.txt > /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup.txt
 	#We will want to call a job here to do what this AraSim call is doing so it can run in parallel
 	cd $WorkingDir
 	qsub -v num=$i AraSimCall.sh
@@ -324,7 +325,7 @@ do
     do
     #Remove if plotting software doesnt need
     #cp data/$i.uan ${i}uan.csv
-	cp Antenna_Performance_Metric/${i}_${freq}.uan "$WorkingDir"/Run_Outputs/$RunName/0_${i}_${freq).uan
+	cp Antenna_Performance_Metric/${i}_${freq}.uan "$WorkingDir"/Run_Outputs/$RunName/0_${i}_${freq}.uan
     done
 done
 
@@ -490,7 +491,7 @@ do
 	do	
 #This next line replaces the number of neutrinos thrown in our setup.txt AraSim file with what ever number you assigned NNT at the top of this program. setup_dummy.txt is a copy of setup.txt that has NNU=num_nnu (NNU is the number of neutrinos thrown. This line finds every instance of num_nnu in setup_dummy.txt and replaces it with $NNT (the number you assigned NNT above). It then pipes this information into setup.txt (and overwrites the last setup.txt file allowing the number of neutrinos thrown to be as variable changed at the top of this script instead of manually changing it in setup.txt each time. Command works the following way: sed "s/oldword/newwordReplacingOldword/" path/to/filewiththisword.txt > path/to/fileWeAreOverwriting.txt                                  
 
-                sed "s/num_nnu/$NNT/" /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup_dummy.txt > /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup.txt
+                sed -e "s/num_nnu/$NNT/" -e "/s/exp/$exp/" /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup_dummy.txt > /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup.txt
 		#./AraSim setup.txt $i outputs/ > $WorkingDir/Antenna_Performance_Metric/AraOut_$i.txt &
 		#rm outputs/*.root
 		cd $WorkingDir
@@ -541,11 +542,8 @@ do
 	cd "$WorkingDir"
 	python gensData.py $gen
 	cd Antenna_Performance_Metric
-	#python LRPlot.py "$WorkingDir" "$WorkingDir"/Run_Outputs/$RunName $[gen+1] $NPOP
-#since I'm not positive the above line works I'm gonna do it a little differently
 	next_gen=$((gen+1))
 	python LRPlot.py "$WorkingDir" "$WorkingDir"/Run_Outputs/$RunName $next_gen $NPOP
-#does the above line work? For $[gen+1] ?
 	cd ..
     
 
