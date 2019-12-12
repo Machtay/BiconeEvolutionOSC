@@ -26,7 +26,7 @@ const double EPSILON = 0.000001; // Catches errors. If the first individual's fi
 
 /* Here we declare our function headers. */
 
-void Read(char* filename, ifstream& inputFile, string* araLineArray, vector<double> &fitnessScores, int individualCounter, double scaleFactor, double* antennaOuterRadii);
+void Read(char* filename, ifstream& inputFile, string* araLineArray, vector<double> &fitnessScores, int individualCounter, double scaleFactor, double* antennaRadii);
 
 void WriteFitnessScores(vector<double> fitnessScores);
 
@@ -43,12 +43,6 @@ int main(int argc, char** argv)
 	string *araLineArray = NULL; // Stores the actual lines read in from the .txt files.
 	ifstream inputFile; // Opens the .txt files.
 	double* antennaRadii = new double[NPOP];
-	double* antennaLengths = new double[NPOP];
-	double* antennaThetas = new double[NPOP];
-	double* antennaOuterRadii = new double[NPOP];
-	vector<string> row;
-	string item;
-
 	cout << "Fitness function initialized." << endl;
 
 	//cout << NPOP << endl << scaleFactor << endl << antennaFile << endl;
@@ -70,31 +64,16 @@ int main(int argc, char** argv)
 		getline(antennaInput, currentLine);
 		}
 		for(int i = 0; i <NPOP; i++){
-		  row.clear();
 		  getline(antennaInput, currentLine);
-		  //antennaRadii[i] = stod(currentLine.substr(0,currentLine.find(",")));
+		  antennaRadii[i] = stod(currentLine.substr(0,currentLine.find(",")));
 		  //cout << antennaRadii[i] << endl;
-
-		  stringstream lineStream(currentLine); 
-
-		  while (getline(lineStream, item, ',')) { 
-		    row.push_back(item);
-		  }
-		  cout << "R: " << row[0] << " L: " << row[1] << " Theta: " << row[2] << endl;
-		  
-		  antennaRadii[i] = stod(row[0]);
-		  antennaLengths[i] = stod(row[1]);
-		  antennaThetas[i] = stod(row[2]);
-		  antennaOuterRadii[i] = antennaRadii[i] + (antennaLengths[i]*tan(antennaThetas[i]));
-		  cout << "Calculated Outer Radii: " << antennaOuterRadii[i] << endl;
-
 		}
 
 			for(int individualCounter = 1; individualCounter <= NPOP; individualCounter++)
 			{
 				araLineArray = new string[NLINES];
 				/* Note the +1 on argv below. This along with the counter starting at 1 starts argv at 2, the third element of argv. Again, the first element is fitnessFunction.exe and the second elemenet is NPOP.*/
-				Read(argv[individualCounter+3], inputFile, araLineArray, fitnessScores, individualCounter, scaleFactor, antennaOuterRadii);
+				Read(argv[individualCounter+3], inputFile, araLineArray, fitnessScores, individualCounter, scaleFactor, antennaRadii);
 				cout << "Data successfully read. Data successfully written." << endl;
 				delete [] araLineArray;
 				araLineArray = NULL;
@@ -104,15 +83,12 @@ int main(int argc, char** argv)
 	cout << "Fitness scores successfully written." << endl << "Fitness function concluded." << endl;
 	}
 	delete[] antennaRadii;
-	delete[] antennaLengths;
-	delete[] antennaThetas;
-	delete[] antennaOuterRadii;
 	return (0);
 }
 
 // Subroutines:
 
-void Read(char* filename, ifstream& inputFile, string* araLineArray, vector<double> &fitnessScores, int individualCounter, double scaleFactor, double* antennaOuterRadii)
+void Read(char* filename, ifstream& inputFile, string* araLineArray, vector<double> &fitnessScores, int individualCounter, double scaleFactor, double* antennaRadii)
 {
 	string txt = filename;
 	inputFile.open(txt.c_str());
@@ -141,8 +117,8 @@ void Read(char* filename, ifstream& inputFile, string* araLineArray, vector<doub
 		vEff = currentLine.substr(commaToken + 2, (spaceToken-commaToken-1));
 		cout << vEff << endl;
 
-		if(antennaOuterRadii[individualCounter-1] >= 12.7){
-		  fitnessScores[individualCounter-1] = stod(vEff)*exp(-pow(scaleFactor*(antennaOuterRadii[individualCounter-1]-12.7)/12.7,2));
+		if(antennaRadii[individualCounter-1] >= 12.7){
+		  fitnessScores[individualCounter-1] = stod(vEff)*exp(-pow(scaleFactor*(antennaRadii[individualCounter-1]-12.7)/12.7,2));
 		  }else{
 		    fitnessScores[individualCounter-1] = stod(vEff);
 		  }

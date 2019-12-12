@@ -43,7 +43,7 @@ int main(int argc, char** argv)
 	string *araLineArray = NULL; // Stores the actual lines read in from the .txt files.
 	ifstream inputFile; // Opens the .txt files.
 	double* antennaRadii = new double[NPOP];
-	double* antennaLengths = new double[NPOP];
+	double* antennLengths = new double[NPOP];
 	double* antennaThetas = new double[NPOP];
 	double* antennaOuterRadii = new double[NPOP];
 	vector<string> row;
@@ -77,15 +77,15 @@ int main(int argc, char** argv)
 
 		  stringstream lineStream(currentLine); 
 
-		  while (getline(lineStream, item, ',')) { 
+		  while (getline(lineStream, item, ', ')) { 
 		    row.push_back(item);
 		  }
-		  cout << "R: " << row[0] << " L: " << row[1] << " Theta: " << row[2] << endl;
+		  cout << "R: " << row[0] << "L: " << row[1] << "Theta: " << row[3] << endl;
 		  
 		  antennaRadii[i] = stod(row[0]);
 		  antennaLengths[i] = stod(row[1]);
 		  antennaThetas[i] = stod(row[2]);
-		  antennaOuterRadii[i] = antennaRadii[i] + (antennaLengths[i]*tan(antennaThetas[i]));
+		  antennaOuterRadii[i] = stod(antennaRadii[i] + (antennaLengths[i]*tan(antennaThetas[i])));
 		  cout << "Calculated Outer Radii: " << antennaOuterRadii[i] << endl;
 
 		}
