@@ -54,7 +54,7 @@ int main(int argc, char** argv)
 	//cout << NPOP << endl << scaleFactor << endl << antennaFile << endl;
 	
 	if(argc != NPOP + 4) // +1 for fitnessFunction.exe, +1 for NPOP. +1 for scaleFactor +1 for fileName
-		cout << "Error, number of elements in argument of fitnessFunction.exe is incorrect! Specify NPOP first, then specify all AraSim output data files, preserving individual order." << endl << endl;
+		cout << "Error, number of elements in argument of fitnessFunction.exe is incorrect! Specify NPOP first, then the scale factor, then specify all AraSim output data files, preserving individual order." << endl << endl;
 	
 	else
 	{
