@@ -1,4 +1,4 @@
- -*- coding: utf-8 -*-
+#-*- coding: utf-8 -*-
 """
 Created on Thu Aug 15 14:54:22 2019
 
@@ -76,11 +76,10 @@ for gen in range(g.numGens):
 
     # Trim the first two elements, since those are words
     # Then insert this into the fScores array
-    fScores.append(fScorei[2:])
-
+    np.append(fScores, fScorei[2:])
     # Convert fScores to a numpy array (The best way to store data in python)
     fScores = np.array(fScores)
-
+    
     # We need to format this into the three things that plot3D needs
     # Add 1 to get the list to start at 1, not zero
     Gen = np.zeros(fScores.shape[0]*fScores.shape[1])

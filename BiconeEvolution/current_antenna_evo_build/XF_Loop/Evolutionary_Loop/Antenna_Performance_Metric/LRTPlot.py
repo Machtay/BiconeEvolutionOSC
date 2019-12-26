@@ -14,7 +14,7 @@ import argparse			# for getting the user's arguments from terminal
 #---------GLOBAL VARIABLES----------GLOBAL VARIABLES----------GLOBAL VARIABLES----------GLOBAL VARIABLES
 
 
-# We need to grab the three arguments from the bash script or user. These arguments in order are [the name of the source folder of the fitness scores], [the name of the destination folder for the plots], and [the number of generations]
+# We need to grab the three arguments from the bash script or user. These arguments in order are [the name of the source folder of the fitness scores], [the name of the destination folder for the plots], and [the number of generations] #why is is number of generations and not gen number??
 parser = argparse.ArgumentParser()
 parser.add_argument("source", help="Name of source folder from home directory", type=str)
 parser.add_argument("destination", help="Name of destination folder from home directory", type=str)
@@ -23,7 +23,7 @@ parser.add_argument("NPOP", help="Number of individuals in a population", type=i
 g = parser.parse_args()
 
 # The name of the plot that will be put into the destination folder, g.destination
-PlotName = "LRPlot2D"
+PlotName = "LRTPlot2D"
 
 
 #----------DEFINITIONS HERE----------DEFINITIONS HERE----------DEFINITIONS HERE----------DEFINITIONS HERE
@@ -32,19 +32,19 @@ PlotName = "LRPlot2D"
 def plotLRT(g, yL, yR, yT, numGens, dest): #yL is length, yR is radius, yT is theta
 	# Plot the result using matplotlib
 	fig = plt.figure(figsize=(20, 6))
-	axL = fig.add_subplot(1,2,1)
-	axL.scatter(g, yL, color='g', marker='o')
-	axL.set_xlabel('Generation')
-	axL.set_ylabel('Length (cm)')
-	axL.set_title('Length over Generations (0-'+str(numGens)+')')
+	axL = fig.add_subplot(1,3,1)
+	axL.plot(g, yL, 'go-')
+	#axL.set_xlabel('Generation')
+	#axL.set_ylabel('Length (cm)')
+	#axL.set_title('Length over Generations (0-'+str(numGens)+')')
 
-	axR = fig.add_subplot(1,2,2)
+	axR = fig.add_subplot(1,3,2)
 	axR.scatter(g, yR, color='g', marker='o')
 	axR.set_xlabel('Generation')
 	axR.set_ylabel('Radius (cm)')
 	axR.set_title('Radius over Generations (0-'+str(numGens)+')')
 
-	axT = fig.add_subplot(1,2,3)
+	axT = fig.add_subplot(1,3,3)
 	axT.scatter(g, yT, color='g', marker='o')
 	axT.set_xlabel('Generation')
 	axT.set_ylabel('Theta (radians)')
@@ -69,7 +69,6 @@ with open(g.source+"/runData.csv", "r") as runDataFile:
 # This list has each element terminating with '\n', so we use rstrip to remove '\n' from each string
 for i in range(len(runDataRaw)):
 	runDataRaw[i] = runDataRaw[i].rstrip()
-
 # Now, we want to store this data in a 2D numpy array. As we'll see, this is a fairly complex process! First, make a new 2D list that contains only the numbers.
 runDataRawOnlyNumb =[]
 for i in range(len(runDataRaw)):
@@ -77,8 +76,9 @@ for i in range(len(runDataRaw)):
 	if i%(g.NPOP+2) != 0 and i%(g.NPOP+2) != 1:
 		# The split function takes '1.122650,19.905200,0.504576,32.500000' -> ['1.122650', '19.905200', '0.504576', '32.500000'] , which makes the new list 2D
 		runDataRawOnlyNumb.append(runDataRaw[i].split(',')) 
-
+print(runDataRawOnlyNumb)
 # Now convert it to a numpy array and roll it up
+runData = []
 runData = np.array(runDataRawOnlyNumb).astype(np.float)
 runData = runData.reshape((g.numGens, g.NPOP,4))
 # Finally, the data is in a useable shape: (generation, individual, characteristic)

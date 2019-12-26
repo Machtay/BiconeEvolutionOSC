@@ -32,7 +32,9 @@ head2 = "SWR : 1.965000"
 head3 = " Theta     Phi     Gain(dB)     Gain     Phase(deg) "
 # .uan file location
 #uanLoc = '/home/suren/Desktop/OSU Research/XFintoARAmod/' 
-uanLoc = "/users/PAS0654/machtay1/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Antenna_Performance_Metric/"
+uanLoc = "/fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Antenna_Performance_Metric/"
+
+#location on machtay1 "/users/PAS0654/machtay1/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Antenna_Performance_Metric/"
 
 # .dat file saving location
 #datLoc = '/home/suren/Desktop/OSU Research/XFintoARAmod/'
@@ -69,7 +71,7 @@ def readFile(indivNum, freqNum):
     f.close()        
     return mat
 
-2
+
 ### START ###
 
 #0 NPOP is taken by argparse from the user or bash script; we set this up first.

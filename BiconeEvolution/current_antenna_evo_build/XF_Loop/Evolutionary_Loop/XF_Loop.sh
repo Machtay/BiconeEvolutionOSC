@@ -20,11 +20,12 @@
 
 ####### LINES TO CHECK OVER WHEN STARTING A NEW RUN ###################################################################
 
-RunName='Cade'           ## Replace when needed
-TotalGens=6   			## number of generations (after initial) to run through
-NPOP=4 				## number of individuals per generation; please keep this value below 99
+RunName='Machtay_12_13_19'           ## Replace when needed
+TotalGens=0   			## number of generations (after initial) to run through
+NPOP=1 				## number of individuals per generation; please keep this value below 99
 FREQ=60 			## frequencies being iterated over in XF (Currectly only affects the output.xmacro loop)
-NNT=10000                          ##Number of Neutrinos Thrown in AraSim   
+NNT=1000                          ##Number of Neutrinos Thrown in AraSim   
+exp=21				#exponent of the energy for the neutrinos in AraSim
 ScaleFactor=1.0                   ##ScaleFactor used when punishing fitness scores of antennae larger than holes used in fitnessFunctoin_ARA.cpp
 #########################################################################################################################
 
@@ -248,7 +249,7 @@ do
 
 #This next line replaces the number of neutrinos thrown in our setup.txt AraSim file with what ever number you assigned NNT at the top of this program. setup_dummy.txt is a copy of setup.txt that has NNU=num_nnu (NNU is the number of neutrinos thrown. This line finds every instance of num_nnu in setup_dummy.txt and replaces it with $NNT (the number you assigned NNT above). It then pipes this information into setup.txt (and overwrites the last setup.txt file allowing the number of neutrinos thrown to be as variable changed at the top of this script instead of manually changing it in setup.txt each time. Command works the following way: sed "s/oldword/newwordReplacingOldword/" path/to/filewiththisword.txt > path/to/fileWeAreOverwriting.txt
 
-        sed "s/num_nnu/$NNT/" /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup_dummy.txt > /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup.txt
+        sed -e "s/num_nnu/$NNT/" -e "s/n_exp/$exp/" /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup_dummy.txt > /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup.txt
 	#We will want to call a job here to do what this AraSim call is doing so it can run in parallel
 	cd $WorkingDir
 	qsub -v num=$i AraSimCall.sh
@@ -257,6 +258,9 @@ do
 	
 done
 
+#This submits the job for the actual ARA bicone. Veff depends on Energy and we need this to run once per run to compare it to. 
+#qsub -v AraSimBiconeActual.sh 
+
 cd $WorkingDir/AraSimFlags/
 nFiles=0
 while [ "$nFiles" != "$NPOP" ]
@@ -264,7 +268,16 @@ do
 	echo "Waiting for AraSim jobs to finish..."
 	sleep 60
 	nFiles=$(ls -1 --file-type | grep -v '/$' | wc -l)
+
+#	echo "Waiting for AraSim jobs to finish..."
+#	sleep 60
+#	shopt -s nullglobs
+#	numfiles=(*)
+#	numfiles=${#numfiles[@]}
+#	nFiles=$numfiles
+#	#nFiles=$(ls -1 --file-type | grep -v '/$' | wc -l)
 done
+
 cd ..
 rm AraSimFlags/*
 
@@ -279,9 +292,12 @@ cd "$WorkingDir"/Antenna_Performance_Metric
 for i in `seq 1 $NPOP`
 do
 
-    cp AraOut_${i}.txt Run_Outputs/$RunName/AraOut_0_${i}.txt
+    cp AraOut_${i}.txt /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Run_Outputs/$RunName/AraOut_0_${i}.txt
 
 done
+
+cp /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Antenna_Performance_Metric/AraOut_ActualBicone.txt /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Run_Outputs/$RunName/AraOut_ActualBicone.txt
+
 ########  Fitness Score Generation (E)  #############################################################################
 #
 #
@@ -314,6 +330,7 @@ rm runData.csv
 python gensData.py 0
 cd Antenna_Performance_Metric
 python LRPlot.py "$WorkingDir" "$WorkingDir"/Run_Outputs/$RunName 1 $NPOP
+#python LRTPlot.py "$WorkingDir" "$WorkingDir"/Run_Outputs/$RunName 1 $NPOP
 cd ..
 # Note: gensData.py floats around in the main dir until it is moved to 
 # Antenna_Performance_Metric
@@ -324,7 +341,7 @@ do
     do
     #Remove if plotting software doesnt need
     #cp data/$i.uan ${i}uan.csv
-	cp Antenna_Performance_Metric/${i}_${freq}.uan "$WorkingDir"/Run_Outputs/$RunName/0_${i}_${freq).uan
+	cp Antenna_Performance_Metric/${i}_${freq}.uan "$WorkingDir"/Run_Outputs/$RunName/0_${i}_${freq}.uan
     done
 done
 
@@ -490,7 +507,7 @@ do
 	do	
 #This next line replaces the number of neutrinos thrown in our setup.txt AraSim file with what ever number you assigned NNT at the top of this program. setup_dummy.txt is a copy of setup.txt that has NNU=num_nnu (NNU is the number of neutrinos thrown. This line finds every instance of num_nnu in setup_dummy.txt and replaces it with $NNT (the number you assigned NNT above). It then pipes this information into setup.txt (and overwrites the last setup.txt file allowing the number of neutrinos thrown to be as variable changed at the top of this script instead of manually changing it in setup.txt each time. Command works the following way: sed "s/oldword/newwordReplacingOldword/" path/to/filewiththisword.txt > path/to/fileWeAreOverwriting.txt                                  
 
-                sed "s/num_nnu/$NNT/" /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup_dummy.txt > /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup.txt
+                sed -e "s/num_nnu/$NNT/" -e "s/exp/$exp/" /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup_dummy.txt > /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup.txt
 		#./AraSim setup.txt $i outputs/ > $WorkingDir/Antenna_Performance_Metric/AraOut_$i.txt &
 		#rm outputs/*.root
 		cd $WorkingDir
@@ -499,7 +516,7 @@ do
 	
 	cd $WorkingDir/AraSimFlags/
 	nFiles=0
-	while [ "$nFiles" != "$NPOP" ]
+	while [ "$nFiles" != "$NPOP"+1]
 	do
 		echo "Waiting for AraSim jobs to finish..."
 		sleep 60
@@ -535,17 +552,20 @@ do
 	done
 
 	./fitnessFunction.exe $NPOP $ScaleFactor $AntennaRadii/generationDNA.csv $InputFiles
+	#what is $AntennaRadii/generationDNA.csv?? It's not defined at the top and I don't think it needs to be a flag for the executable
 	mv fitnessScores.csv "$WorkingDir"
 
     # Reorganize and extract useful data
 	cd "$WorkingDir"
 	python gensData.py $gen
 	cd Antenna_Performance_Metric
-	#python LRPlot.py "$WorkingDir" "$WorkingDir"/Run_Outputs/$RunName $[gen+1] $NPOP
+	#python LRTPlot.py "$WorkingDir" "$WorkingDir"/Run_Outputs/$RunName $[gen+1] $NPOP
 #since I'm not positive the above line works I'm gonna do it a little differently
 	next_gen=$((gen+1))
 	python LRPlot.py "$WorkingDir" "$WorkingDir"/Run_Outputs/$RunName $next_gen $NPOP
-#does the above line work? For $[gen+1] ?
+	#python LRTPlot.py "$WorkingDir" "$WorkingDir"/Run_Outputs/$RunName $next_gen $NPOP
+	#Here's how we get the plots for the Veff of each of the antennas
+
 	cd ..
     
 
