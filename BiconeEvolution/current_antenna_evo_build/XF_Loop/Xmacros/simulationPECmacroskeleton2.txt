@@ -211,7 +211,7 @@ function CreateAntennaSimulationData()
 function QueueSimulation()
 {
    // Create and start the simulation. Project must be saved in order to run.
-       var simulation = App.getActiveProject().createSimulation( true );
+       var simulation = App.getActiveProject().createSimulation( false );
 
     Output.println( "Successfully created the simulation." );
 
@@ -219,5 +219,5 @@ function QueueSimulation()
        var simulationId = simulation.getSimulationId();
     var numRuns = simulation.getRunCount();
 }
-
+App.quit();
 
