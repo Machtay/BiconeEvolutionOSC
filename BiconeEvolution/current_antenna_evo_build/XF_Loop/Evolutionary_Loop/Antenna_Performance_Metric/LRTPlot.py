@@ -28,32 +28,6 @@ PlotName = "LRTPlot2D"
 
 #----------DEFINITIONS HERE----------DEFINITIONS HERE----------DEFINITIONS HERE----------DEFINITIONS HERE
 
-
-def plotLRT(g, yL, yR, yT, numGens, dest): #yL is length, yR is radius, yT is theta
-	# Plot the result using matplotlib
-	fig = plt.figure(figsize=(20, 6))
-	axL = fig.add_subplot(1,3,1)
-	axL.plot(g, yL, 'go-')
-	#axL.set_xlabel('Generation')
-	#axL.set_ylabel('Length (cm)')
-	#axL.set_title('Length over Generations (0-'+str(numGens)+')')
-
-	axR = fig.add_subplot(1,3,2)
-	axR.scatter(g, yR, color='g', marker='o')
-	axR.set_xlabel('Generation')
-	axR.set_ylabel('Radius (cm)')
-	axR.set_title('Radius over Generations (0-'+str(numGens)+')')
-
-	axT = fig.add_subplot(1,3,3)
-	axT.scatter(g, yT, color='g', marker='o')
-	axT.set_xlabel('Generation')
-	axT.set_ylabel('Theta (radians)')
-	axT.set_title('Theta over Generations (0-'+str(numGens)+')')
-
-	plt.savefig(dest+"/"+PlotName)
-	plt.show()
-
-
 #----------STARTS HERE----------STARTS HERE----------STARTS HERE----------STARTS HERE 
 
 
@@ -76,45 +50,87 @@ for i in range(len(runDataRaw)):
 	if i%(g.NPOP+2) != 0 and i%(g.NPOP+2) != 1:
 		# The split function takes '1.122650,19.905200,0.504576,32.500000' -> ['1.122650', '19.905200', '0.504576', '32.500000'] , which makes the new list 2D
 		runDataRawOnlyNumb.append(runDataRaw[i].split(',')) 
-print(runDataRawOnlyNumb)
+#print(runDataRawOnlyNumb)
 # Now convert it to a numpy array and roll it up
 runData = []
 runData = np.array(runDataRawOnlyNumb).astype(np.float)
 runData = runData.reshape((g.numGens, g.NPOP,4))
-# Finally, the data is in a useable shape: (generation, individual, characteristic)
+
+# Finally, the data is in an almost useable shape: (generation, individual, characteristic)
 
 
 # PLOT DATA
 
-# Create the x array. Need to duplicate the generation number for each individual in pop
-'''
-For g.numGens=4, g.NPOP=10, generations should look like:
-[ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  1.  1.  1.  1.  1.  1.  1.  1.
-  1.  1.  2.  2.  2.  2.  2.  2.  2.  2.  2.  2.  3.  3.  3.  3.  3.  3.
-  3.  3.  3.  3.]
-'''
-generations = np.zeros((runData.shape[0]*runData.shape[1]))
-for gen in range(g.numGens):
-	for indiv in range(g.NPOP):
-		generations[gen*g.NPOP + indiv] = gen
+# Create an array of every length
+allLengths = runData[:,:, 1].flatten()
 
-# Create the yL array.
-lengths = runData[:,:, 1].flatten()
+# The loop below converts the messy lengths array into a cleaner array of arrays:
+# lengths = [I1_G0, I2_G0, I3_G0, I1_G1, I2_G1....]
+# to
+# lengthArray = [ [I1_G0, I1_G1, I1_G2...], [I2_G0, I2_G1, I2_G2...], ...]
+lengthsArray = []
+templength = [] 
+for ind in range(g.NPOP):
+    for l in range(0,len(allLengths),g.NPOP):
+        templength.append(allLengths[l+ind])
+    lengthsArray.append(templength)
+    templength = []
 
-# Create the yR array
-radii = runData[:,:, 0].flatten()
 
-# Create the yT array
-thetas = runData[:, :, 2].flatten()
+# Create an array of every radius
+allRadii = runData[:,:, 0].flatten()
+
+radiiArray = []
+tempradii = []
+for ind in range(g.NPOP):
+    for l in range(0,len(allRadii),g.NPOP):
+            tempradii.append(allRadii[l+ind])
+    radiiArray.append(tempradii)
+    tempradii = []
+
+
+
+# Create an array of every theta
+allThetas = runData[:, :, 2].flatten()
+
+thetasArray = []
+tempthetas = []
+for ind in range(g.NPOP):
+    for l in range(0,len(allThetas),g.NPOP):
+            tempthetas.append(allThetas[l+ind])
+    thetasArray.append(tempthetas)
+    tempthetas = []
 
 # Plot!
-plotLRT(generations, lengths, radii, thetas, g.numGens, g.destination)
+#Create figure and subplots
+fig = plt.figure(figsize=(20, 6))
+axL = fig.add_subplot(1,3,1)
+axR = fig.add_subplot(1,3,2)
+axT = fig.add_subplot(1,3,3)
+
+# Loop through each individual and plot each array
+for ind in range(g.NPOP):
+    LabelName = "Individual {}".format(ind+1)
+    axL.plot(lengthsArray[ind], 'o-', label = LabelName)
+    axR.plot(radiiArray[ind], 'o-', label = LabelName)
+    axT.plot(thetasArray[ind], 'o-', label = LabelName)
+
+# Labels:
+axL.set(xlabel='Generation', ylabel = 'Length [cm]')
+axR.set(xlabel='Generation', ylabel = 'Length [cm]')
+axT.set(xlabel='Generation', ylabel = 'Theta [Radians]')
+
+axL.set_title("Length over Generations (0 - {})".format(int(g.numGens-1)))
+axR.set_title("Radius over Generations (0 - {})".format(int(g.numGens-1)))
+axT.set_title("Theta over Generations (0 - {})".format(int(g.numGens-1)))
 
 
+axL.legend()
+axR.legend()
+axT.legend()
 
-
-
-# python3 LRPlot.py "/home/suren/Desktop/OSU Research/LRPlotWork" "/home/suren/Desktop/OSU Research/LRPlotWork" 10 4
+plt.savefig(g.destination + "/" + PlotName)
+plt.show()
 
 
 

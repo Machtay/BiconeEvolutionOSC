@@ -40,5 +40,5 @@ plt.figure(figsize = (10, 6))
 
 plt.xaxis("Generation")
 plt.yaxis("Veff")
-plt.plot(numGens, Veff, 'ro')
+plt.errorbar(numGens, Veff, yerr = [Err_plus, Err_minus])
 

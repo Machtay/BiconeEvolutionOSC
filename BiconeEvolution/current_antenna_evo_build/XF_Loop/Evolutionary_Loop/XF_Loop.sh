@@ -1,24 +1,26 @@
 #!/bin/bash
 #Evolutionary loop for antennas.
-#Last update: November 15, 2019 by Julie Rolla
+#Last update: December 23, 2019 by Julie Rolla
 #OSU GENETIS Team
 #PBS -e /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loops/Evolutionary_Loop/scriptEOFiles
 #PBS -o /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loops/Evolutionary_Loop/scriptEOFiles
-####################################################################################################################
+
+################################################################################################################################################
 #
 #
-# The way this loop is written now is so it does steps A-F for the first generation before looping through the rest of the generations and doing the the same steps for each generation. One thing that we should think about improving is putting the first generation into the same loop barring any initialization steps that may need to be adjusted.
+# The way this loop is written now is so it does steps A-F for the first generation before looping through the rest of the generations and doing the the same steps for each generation. 
+# One thing that we should think about improving is putting the first generation into the same loop barring any initialization steps that may need to be adjusted.
 #
 # The code is optimised for a dynamic choice of NPOP UP TO fitnessFunction.exe. From there on, it has not been checked.
 #
 #
-####################################################################################################################
+################################################################################################################################################
 
 
 
 
 
-####### LINES TO CHECK OVER WHEN STARTING A NEW RUN ###################################################################
+####### LINES TO CHECK OVER WHEN STARTING A NEW RUN ###############################################################################################
 
 RunName='Machtay_12_13_19'           ## Replace when needed
 TotalGens=0   			## number of generations (after initial) to run through
@@ -27,14 +29,14 @@ FREQ=60 			## frequencies being iterated over in XF (Currectly only affects the 
 NNT=1000                          ##Number of Neutrinos Thrown in AraSim   
 exp=21				#exponent of the energy for the neutrinos in AraSim
 ScaleFactor=1.0                   ##ScaleFactor used when punishing fitness scores of antennae larger than holes used in fitnessFunctoin_ARA.cpp
-#########################################################################################################################
+#####################################################################################################################################################
 
 
 
 
 
 
-########  Initialization of variables  ###################################################################################
+########  Initialization of variables  ###############################################################################################################
 BEOSC=/fs/project/PAS0654/BiconeEvolutionOSC
 WorkingDir=`pwd` #this is /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop
 echo $WorkingDir
@@ -53,9 +55,8 @@ line3='query.projectId = App.getActiveProject().getProjectDirectory();'
 #line4='query.simulationId = '  ## append 6-digit simulation ID number; for example "000001";
 ## cat skeleton here
 #lastline='FarZoneUtils.exportToUANFile(thdata,thphase,phdata,phphase,inputpower,"/home/radio/Documents/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Antenna_Performance_Metric/' ##append simulation ID number followed by .uan");
+######################################################################################################################################################## 
 
-
-############################################################################################################################
 # Make the run name directory
 mkdir -m 777 $WorkingDir/Run_Outputs/$RunName
 #chmod 777 $WorkingDir/Run_Outputs
@@ -64,15 +65,12 @@ python dateMaker.py
 mv "runDate.txt" "$WorkingDir/Run_Outputs/$RunName/" -f
 
 
-
 #If I put the following command here, it should initialize the AraSim input file without needing user input
 #head -n 162 Alex_Loop.sh | tail -72 > /fs/project/PAS0654/AraSim/test_setup.txt
 
 
 
-
-
-########    Execute our initial genetic algorithm (A)     #################################################
+########    Execute our initial genetic algorithm (A)    #############################################################################
 #
 #
 #   This part of the loop  ::
@@ -85,7 +83,7 @@ mv "runDate.txt" "$WorkingDir/Run_Outputs/$RunName/" -f
 #
 #
 #
-###########################################################################################################
+#######################################################################################################################################
 
 
 ./roulette_algorithm.exe start $NPOP
@@ -94,10 +92,7 @@ mv "runDate.txt" "$WorkingDir/Run_Outputs/$RunName/" -f
 cp generationDNA.csv Run_Outputs/$RunName/0_generationDNA.csv
 
 
-
-
-
-########    XF Simulation Software (B)     ##############################################################
+########    XF Simulation Software (B)     ########################################################################################## 
 #
 #
 #     1. Prepares output.xmacro with generic parameters such as :: 
@@ -113,22 +108,15 @@ cp generationDNA.csv Run_Outputs/$RunName/0_generationDNA.csv
 #     3. Runs XF and loads XF with both xmacros. 
 #
 #
-##########################################################################################################
-
-
-
+###################################################################################################################################### 
 
 # First, remove the old .xmacro files
 #when do that, we end up making the files only readable; we should just overwrite them
 #alternatively, we can just set them as rwe when the script makes them
 cd $XmacrosDir
-
-#I'm commenting out the next two lines. They are written to below (around lines 154-170)
-#If we keep them this way then the files have restricted permissions
  
 rm output.xmacro
 rm simulation_PEC.xmacro
-
 
 : 'Cat the relevant information onto output.xmacro for each antenna in a generation. 
 The zeroStr will be used to paste the appropriate number of zeros into the simulation ID'
@@ -145,22 +133,17 @@ cat outputmacroskeleton.txt >> output.xmacro
 
 # Building the simulation_PEC.xmacro is a bit simpler. Cat the first skeleton, add the gridsize from datasize.txt, and cat the second skeleton
 
-
-
 echo "var NPOP = $NPOP;" >> simulation_PEC.xmacro
 echo "App.saveCurrentProjectAs(\"/fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Run_Outputs/$RunName/$RunName\");" >> simulation_PEC.xmacro
 
 cat simulationPECmacroskeleton.txt >> simulation_PEC.xmacro 
 cd "$WorkingDir"
 
-
 cd $XmacrosDir 
 
-
-#The above line needs to be fixed
+#The above line needs to be fixed(Says who? when? Julie 12/25/19)
 
 cat simulationPECmacroskeleton2.txt >> simulation_PEC.xmacro
-
 
 echo
 echo
@@ -186,19 +169,14 @@ cd $WorkingDir
 	
 xfdtd $XFProj --execute-macro-script=/fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Xmacros/output.xmacro || true
 
-##chmod -R 770 $BEOSC #We're just gonna put this after at the end of every block
 
-
-########  XF output conversion code (C)  ###############################################################
+########  XF output conversion code (C)  ###########################################################################################
 #
 #
 #         1. Converts .uan file from XF into a readable .dat file that Arasim can take in.
 #
 #
-########################################################################################################
-
-
-
+####################################################################################################################################
 
 echo
 #read -p "Press any key to continue... " -n1 -s
@@ -215,9 +193,7 @@ cd Antenna_Performance_Metric
 
 python XFintoARA.py $NPOP 
 
-##chmod -R 770 $BEOSC
-
-########  AraSim Execution (D)  ######################################################################################
+########  AraSim Execution (D)  ################################################################################################################## 
 #
 #
 #       1. Moves each .dat file individually into a folder that AraSim can access while changing to a .txt file that AraSim can use. (can we just have the .py program make this output a .txt?)
@@ -227,9 +203,7 @@ python XFintoARA.py $NPOP
 #           III. Moves the AraSim output into the Antenna_Performance_Metric folder
 #
 #
-######################################################################################################################
-
-
+################################################################################################################################################## 
 
 for i in `seq 1 $NPOP`
 do
@@ -247,8 +221,13 @@ cd "$AraSimExec"
 for i in `seq 1 $NPOP`
 do
 
-#This next line replaces the number of neutrinos thrown in our setup.txt AraSim file with what ever number you assigned NNT at the top of this program. setup_dummy.txt is a copy of setup.txt that has NNU=num_nnu (NNU is the number of neutrinos thrown. This line finds every instance of num_nnu in setup_dummy.txt and replaces it with $NNT (the number you assigned NNT above). It then pipes this information into setup.txt (and overwrites the last setup.txt file allowing the number of neutrinos thrown to be as variable changed at the top of this script instead of manually changing it in setup.txt each time. Command works the following way: sed "s/oldword/newwordReplacingOldword/" path/to/filewiththisword.txt > path/to/fileWeAreOverwriting.txt
-
+##############################################################################################################################################################################                             
+###This next line replaces the number of neutrinos thrown in our setup.txt AraSim file with what ever number you assigned NNT at the top of this program. setup_dummy.txt  ###                             
+###is a copy of setup.txt that has NNU=num_nnu (NNU is the number of neutrinos thrown. This line finds every instance of num_nnu in setup_dummy.txt and replaces it with   ###                             
+###$NNT (the number you assigned NNT above). It then pipes this information into setup.txt (and overwrites the last setup.txt file allowing the number of neutrinos thrown ###                             
+###to be as variable changed at the top of this script instead of manually changing it in setup.txt each time. Command works the following way:                            ###                             
+###sed "s/oldword/newwordReplacingOldword/" path/to/filewiththisword.txt > path/to/fileWeAreOverwriting.txt                                                                ###                             
+##############################################################################################################################################################################     
         sed -e "s/num_nnu/$NNT/" -e "s/n_exp/$exp/" /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup_dummy.txt > /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup.txt
 	#We will want to call a job here to do what this AraSim call is doing so it can run in parallel
 	cd $WorkingDir
@@ -259,7 +238,7 @@ do
 done
 
 #This submits the job for the actual ARA bicone. Veff depends on Energy and we need this to run once per run to compare it to. 
-#qsub -v AraSimBiconeActual.sh 
+qsub AraSimBiconeActual.sh 
 
 cd $WorkingDir/AraSimFlags/
 nFiles=0
@@ -283,8 +262,6 @@ rm AraSimFlags/*
 
 #file check delay goes here
 
-##chmod -R 770 $BEOSC
-
 wait
 
 cd "$WorkingDir"/Antenna_Performance_Metric
@@ -298,7 +275,7 @@ done
 
 cp /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Antenna_Performance_Metric/AraOut_ActualBicone.txt /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Run_Outputs/$RunName/AraOut_ActualBicone.txt
 
-########  Fitness Score Generation (E)  #############################################################################
+########  Fitness Score Generation (E)  ######################################################################################################### 
 #
 #
 #      1. Takes AraSim data and cocatenates each file name into one string that is then used to generate fitness scores 
@@ -308,7 +285,7 @@ cp /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_bu
 #      3. Copies each .uan file from the Antenna_Performance_Metric folder and moves to Run_Outputs/$RunName folder
 #
 #
-########################################################################################################################
+#################################################################################################################################################### 
 
 echo 'Starting fitness function calculating portion...'
 
@@ -345,20 +322,15 @@ do
     done
 done
 
-#The line above is where I think something is going wrong; a couple lines below there's also a relevant line and I'm not seeing where the files above are input to be changed to i_generation.csv, but 0_generation.csv is definitely being made
-
-##chmod -R 770 $BEOSC
-
 echo 'Congrats on getting a fitness score!'
 
-########  Plotting (F)  ################################################################################################
+########  Plotting (F)  ############################################################################################################################ 
 #
 #
 #      1. Plots in 3D and 2D of current and all previous generation's scores. Saves the 2D plots. Extracts data from $RunName folder in all of the i_generationDNA.csv files. Plots to same directory.
 #
 #
-########################################################################################################################
-
+#################################################################################################################################################### 
 
 # Current Plotting Software
 
@@ -367,16 +339,10 @@ cd Antenna_Performance_Metric
 python FScorePlot.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $NPOP
 cd "$WorkingDir"
 
-
-##chmod -R 770 $BEOSC
-
-
 echo 'Congrats on getting some nice plots!'
 
 
-
-
-########  Loop (G)  ######################################################################################
+########  Loop (G)  ################################################################################################################## 
 #
 #
 #     1. Does steps A-F for each generation
@@ -384,9 +350,7 @@ echo 'Congrats on getting some nice plots!'
 #
 #
 #
-###########################################################################################################
-
-
+####################################################################################################################################### 
 
 for gen in `seq 1 $TotalGens`
 do                                 
@@ -397,26 +361,25 @@ do
 
 	read -p "Starting generation ${gen}. Press any key to continue... " -n1 -s
 
-#Part A
-	#I think these next two lines can be deleted. Its repeated again just below...11/30/19 comment by Julie  #cd $XmacrosDir #rm simulation_PEC.xmacro
+############## 
+### Part A ###
+############## 
+
 	cd "$WorkingDir"
 	./roulette_algorithm.exe cont $NPOP
 
 	cp generationDNA.csv Run_Outputs/$RunName/${gen}_generationDNA.csv
 
-    ##chmod -R 777 $WorkingDir
-
 #we can make a function that does this with the flag $gen
 #doing this in part A would mean setting $gen=0
 
-#Part B
-		# First, remove the old .xmacro files
-	#when do that, we end up making the files only readable; we should just overwrite them
-	#alternatively, we can just set them as rwe when the script makes them
-	cd $XmacrosDir
+############## 
+### Part B ###
+############## 
 
-	#I'm commenting out the next two lines. They are written to below (around lines 154-170)
-	#If we keep them this way then the files have restricted permissions
+	# First, remove the old .xmacro files. When do that, we end up making the files only readable; we should just overwrite them. Alternatively, we can just set them 
+	# when the script makes them.
+	cd $XmacrosDir
 	 
 	rm output.xmacro
 	rm simulation_PEC.xmacro
@@ -425,7 +388,6 @@ do
 	: 'Cat the relevant information onto output.xmacro for each antenna in a generation. 
 	The zeroStr will be used to paste the appropriate number of zeros into the simulation ID'
 	zeroStr=('00000' '0000' '000' '00' '0')
-
 
 	# NEW WAY
 	#(using the single > over >> overwrites instead of appending)
@@ -437,17 +399,13 @@ do
 
 	# Building the simulation_PEC.xmacro is a bit simpler. Cat the first skeleton, add the gridsize from datasize.txt, and cat the second skeleton
 
-
-
 	echo "var NPOP = $NPOP;" >> simulation_PEC.xmacro
 	cat simulationPECmacroskeleton.txt >> simulation_PEC.xmacro 
 	cd "$WorkingDir"
 
-
 	cd $XmacrosDir 
 
-
-	#The above line needs to be fixed
+	#The above line needs to be fixed (who wrote this? When? It seems fine? Whats going on? Julie 12/25/19)
 
 	cat simulationPECmacroskeleton2.txt >> simulation_PEC.xmacro
 
@@ -466,7 +424,6 @@ do
 	module load xfdtd
 	xfdtd $XFProj --execute-macro-script=/fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Xmacros/simulation_PEC.xmacro || true
 
-
 	for i in `seq 1 $NPOP`
 	do
 		cd $XFProj/Simulations/00000$i/Run0001/
@@ -479,8 +436,10 @@ do
 
 	##chmod -R 770 $BEOSC #We're just gonna put this after at the end of every block
 
+############## 
+### Part C ###
+############## 
 
-#Part C
     #read -p "Press any key to continue... " -n1 -s
 	echo "Resuming..."
 	echo
@@ -494,8 +453,11 @@ do
 
 	python XFintoARA.py $NPOP
 
-	##chmod -R 777 $WorkingDir
-#Part D
+
+############## 
+### Part D ###
+############## 
+
 	for i in `seq 1 $NPOP`
 	do
 		mv evol_antenna_model_$i.dat $AraSimExec/a_$i.txt
@@ -505,7 +467,14 @@ do
 
 	for i in `seq 1 $NPOP`
 	do	
-#This next line replaces the number of neutrinos thrown in our setup.txt AraSim file with what ever number you assigned NNT at the top of this program. setup_dummy.txt is a copy of setup.txt that has NNU=num_nnu (NNU is the number of neutrinos thrown. This line finds every instance of num_nnu in setup_dummy.txt and replaces it with $NNT (the number you assigned NNT above). It then pipes this information into setup.txt (and overwrites the last setup.txt file allowing the number of neutrinos thrown to be as variable changed at the top of this script instead of manually changing it in setup.txt each time. Command works the following way: sed "s/oldword/newwordReplacingOldword/" path/to/filewiththisword.txt > path/to/fileWeAreOverwriting.txt                                  
+
+##############################################################################################################################################################################
+###This next line replaces the number of neutrinos thrown in our setup.txt AraSim file with what ever number you assigned NNT at the top of this program. setup_dummy.txt  ###
+###is a copy of setup.txt that has NNU=num_nnu (NNU is the number of neutrinos thrown. This line finds every instance of num_nnu in setup_dummy.txt and replaces it with   ###
+###$NNT (the number you assigned NNT above). It then pipes this information into setup.txt (and overwrites the last setup.txt file allowing the number of neutrinos thrown ###
+###to be as variable changed at the top of this script instead of manually changing it in setup.txt each time. Command works the following way:                            ###
+###sed "s/oldword/newwordReplacingOldword/" path/to/filewiththisword.txt > path/to/fileWeAreOverwriting.txt                                                                ###     
+##############################################################################################################################################################################
 
                 sed -e "s/num_nnu/$NNT/" -e "s/exp/$exp/" /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup_dummy.txt > /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup.txt
 		#./AraSim setup.txt $i outputs/ > $WorkingDir/Antenna_Performance_Metric/AraOut_$i.txt &
@@ -535,7 +504,10 @@ do
 
 	done
 
-#Part E
+############## 
+### Part E ###
+############## 
+
 	#InputFiles=
 	#commented out in Part E with the comment that it can be taken out
 	#for ((i=1; i<=NPOP; i++))
@@ -568,7 +540,6 @@ do
 
 	cd ..
     
-
 	for i in `seq 1 $NPOP`
 	do
 	    for freq in `seq 1 60`
@@ -583,9 +554,10 @@ do
 
 	echo 'Congrats on getting a fitness score!'
 
-	#chmod -R 777 $BEOSC
+##############
+### Part F ###
+##############
 
-#Part F
     # Current Plotting Software
 	cd Antenna_Performance_Metric
    
@@ -601,15 +573,20 @@ do
 done
 
 
-
-
 #cd "$WorkingDir"
 #./roulette_algorithm.exe --cont
 cp generationDNA.csv "$WorkingDir"/Run_Outputs/$RunName/FinalGenerationParameters.csv
 mv runData.csv Antenna_Performance_Metric
 
-##chmod -R 777 $WorkingDir
-
+#########################################################################################################################
+###Moving the Veff AraSim output for the actual ARA bicone into the $RunName directory so this data isn't lost in     ###
+###the next time we start a run. Note that we don't move it earlier since (1) our plotting software and fitness score ###
+###calculator expect it where it is created in "$WorkingDir"/Antenna_Performance_Metric, and (2) we are only creating ###
+###it once on gen 0 so it's not written over in the looping process.                                                  ###
+########################################################################################################################
+cd "$WorkingDir"
+mv AraOut_ActualBicone.txt "$WorkingDir"/Run_Outputs/$RunName/AraOut_ActualBicone.txt
+ 
 echo
 echo 'Done!'
 
