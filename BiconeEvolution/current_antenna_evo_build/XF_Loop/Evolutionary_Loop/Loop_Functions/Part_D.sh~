@@ -1,0 +1,76 @@
+#!/bin/bash
+
+#this will contain part D of the loop
+
+
+########  AraSim Execution (D)  ######################################################################################
+#
+#
+#       1. Moves each .dat file individually into a folder that AraSim can access
+#
+#       2. For each individual ::
+#           I. Move its .dat file into one .txt file that arasim can use    (Possibly combine this step with step 1)
+#           II. Run Arasim for that text file
+#           III. Moves the AraSim output into the Antenna_Performance_Metric folder
+#
+#
+######################################################################################################################
+
+
+if [ $gen -eq 0 ]
+then
+	for i in `seq 1 $NPOP`
+	do
+		mv evol_antenna_model_$i.dat "$AraSimExec"
+	done
+
+
+
+	#read -p "Press any key to continue... " -n1 -s
+	echo "Resuming..."
+	echo
+
+	cd "$AraSimExec"
+
+	for i in `seq 1 $NPOP`
+	do
+	#Why is this called ARA_bicone6in_output.txt. Rename this.
+	cp evol_antenna_model_$i.dat ARA_bicone6in_output.txt
+
+
+
+		#We will want to call a job here to do what this AraSim call is doing so it can run in parallel
+	cd $WorkingDir
+	qsub -v number=$i -v dir=$WorkingDir AraSimCall.sh
+		
+	done
+
+	chmod -R 770 $WorkingDir
+
+	wait
+else
+	for i in `seq 1 $NPOP`
+	do
+		mv evol_antenna_model_$i.dat "$AraSimExec"
+	done
+
+	cd "$AraSimExec"
+
+	for i in `seq 1 $NPOP`
+	do	
+        	#Why is this called ARA_bicone6in_output.txt. Rename this.
+	        
+		cp evol_antenna_model_$i.dat ARA_bicone6in_output.txt
+		#Replaced the orignal command with a job call for the same command
+	    
+		#./AraSim setup.txt $i outputs/ > $WorkingDir/Antenna_Performance_Metric/AraOut_$i.txt &
+		#rm outputs/*.root
+		cd $WorkingDir
+		qsub -v number=$i -v dir=$WorkingDir AraSimCall.sh
+	done
+	
+	chmod -R 770 $WorkingDir
+
+	wait
+
+

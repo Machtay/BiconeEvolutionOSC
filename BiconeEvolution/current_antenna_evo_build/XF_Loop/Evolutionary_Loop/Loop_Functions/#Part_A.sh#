@@ -1,0 +1,41 @@
+B#!/bin/bash
+
+#this will contain part A of the loop
+
+
+########    Execute our initial genetic algorithm (A)     #################################################
+#
+#
+#   This part of the loop  ::
+#
+#      1. Runs genetic algorithm
+#
+#
+#      2. Moves GA outputs and renames the .csv file so it isn't overwritten 
+#
+#
+#
+#
+###########################################################################################################
+
+# we nned to make it so that this can work for both gen 0 and gen > 0
+# the if statement will work for the 0 generation
+# the else statement works for when we are looping from gen = 1 to NPOP
+if [ $gen -eq 0 ]
+
+then
+	./roulette_algorithm.exe start $NPOP
+	cp generationDNA.csv Run_Outputs/$RunName/0_generationDNA.csv
+	echo "True"
+
+else
+	cd $XmacrosDir
+    	rm simulation_PEC.xmacro
+    	cd "$WorkingDir"
+    	./roulette_algorithm.exe cont $NPOP
+
+    	cp generationDNA.csv Run_Outputs/$RunName/${gen}_generationDNA.csv
+
+    	chmod -R 770 $WorkingDir
+	echo "False"
+fi

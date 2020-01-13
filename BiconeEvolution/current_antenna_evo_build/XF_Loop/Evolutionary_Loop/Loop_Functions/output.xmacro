@@ -1,0 +1,4 @@
+var query = new ResultQuery();
+///////////////////////Get Theta and Phi Gain///////////////
+query.projectId = App.getActiveProject().getProjectDirectory();
+var NPOP = ;

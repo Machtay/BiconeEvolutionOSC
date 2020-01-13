@@ -130,7 +130,8 @@ axR.legend()
 axT.legend()
 
 plt.savefig(g.destination + "/" + PlotName)
-plt.show()
+plt.show(block=False)
+plt.pause(2)
 
 
 

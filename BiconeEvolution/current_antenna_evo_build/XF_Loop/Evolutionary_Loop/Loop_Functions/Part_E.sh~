@@ -1,0 +1,91 @@
+#!/bin/bash
+######## Fitness Score Generation (E) ##################################################################################################################
+#
+#
+#     1. Takes AraSim data and cocatenates each file name into one string that is then used to generate fitness scores
+#
+#     2. Then gensData.py extracts useful information from generationDNA.csv and fitnessScores.csv, and writes to maxFitnessScores.csv and runData.csv
+#
+#     3. Copies each .uan file from the Antenna_Performance_Metric folder and moves to Run_Outputs/$RunName folder
+#
+#
+########################################################################################################################################################
+
+if [ $gen -eq 0 ]
+then
+	cd "$WorkingDir"/Antenna_Performance_Metric
+	mv *.root "$WorkingDir/Run_Outputs/$RunName/RootFilesGen0/"
+
+	#Check what this first line does. It can probably be taken out.
+	#InputFiles=
+	for i in `seq 1 $NPOP`
+	do
+	    InputFiles="${InputFiles}AraOut_${i}.txt "
+	done
+
+	./fitnessFunction.exe $NPOP $InputFiles  
+	cp fitnessScores.csv "$WorkingDir"/Run_Outputs/$RunName/0_fitnessScores.csv
+	mv fitnessScores.csv "$WorkingDir"
+
+	cd "$WorkingDir"
+	rm runData.csv
+	python gensData.py 0
+	cd Antenna_Performance_Metric
+	python LRPlot.py "$WorkingDir" "$WorkingDir"/Run_Outputs/$RunName 1 $NPOP
+	cd ..
+	# Note: gensData.py floats around in the main dir until it is moved to 
+	# Antenna_Performance_Metric
+
+	for i in `seq 1 $NPOP`
+	do
+	    #Remove if plotting software doesnt need
+	    #cp data/$i.uan ${i}uan.csv
+	    cp Antenna_Performance_Metric/$i.uan "$WorkingDir"/Run_Outputs/$RunName/0_${i}.uan
+	done
+
+	#The line above is where I think something is going wrong; a couple lines below there's also a relevant line and I'm not seeing where the files above are input to be changed to i_generation.csv, but 0_generation.csv is definitely being made
+
+chmod -R 770 $BEOSC
+
+
+else
+	#I'm not sure if we need this--it doesn't appear in the above part of part E
+	#for ((i=1; i<=NPOP; i++))
+		#do
+			#InputFiles="${InputFiles}AraOut_${i}.txt "
+		#done
+	#I commented out the above command to replace it with the one below because it agrees more with the
+	#way it's written in the first part above
+	for i in `seq 1 $NPOP`
+	do
+	    InputFiles="${InputFiles}AraOut_${i}.txt "
+	done
+	
+	cd "$WorkingDir"/Antenna_Performance_Metric
+	mv *.root "$WorkingDir/Run_Outputs/$RunName/RootFilesGen${gen}/"
+	
+    	./fitnessFunction.exe $NPOP $InputFiles
+	mv fitnessScores.csv "$WorkingDir"
+	cd "$WorkingDir"
+
+
+	# Reorganize and extract useful data
+	cd "$WorkingDir"
+	python gensData.py $gen
+	cd Antenna_Performance_Metric
+	python LRPlot.py "$WorkingDir" "$WorkingDir"/Run_Outputs/$RunName $[gen+1] $NPOP
+	#does the above line work? For $[gen+1] ?
+	cd ..
+	    
+
+	for i in `seq 1 $NPOP`
+	do
+	    # Gens data used to create a .csv file for the uan file for gain plotting
+	    # cp Antenna_Performance_Metric/$i.uan ${i}uan.csv
+		cp Antenna_Performance_Metric/$i.uan "$WorkingDir"/Run_Outputs/$RunName/${gen}_${i}.uan
+	done
+
+	mv fitnessScores.csv Run_Outputs/$RunName/${gen}_fitnessScores.csv
+
+	chmod -R 770 $BEOSC
+fi

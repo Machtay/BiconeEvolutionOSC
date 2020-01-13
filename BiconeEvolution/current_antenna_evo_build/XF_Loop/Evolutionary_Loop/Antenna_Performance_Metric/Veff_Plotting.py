@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import os			
 import argparse
 
-# We need to grab the three arguments from the bash script or user. These arguments in order are [the name of the source folder of the fitness scores], [the name of the destination folder for the plots], and [the number of generations]
+# We need to grab the three arguments from the bash script or user. These arguments in order are [the name of the source folder of the fitness scores], [the name of the destination folder for the plots], and [the number of generations] and the NPOP
 parser = argparse.ArgumentParser()
 parser.add_argument("source", help="Name of source folder from home directory", type=str)
 parser.add_argument("destination", help="Name of destination folder from home directory", type=str)
@@ -11,34 +11,56 @@ parser.add_argument("numGens", help="Number of generations the code is running f
 parser.add_argument("NPOP", help="Number of individuals in a population", type=int)
 g = parser.parse_args()
 
-"""
-code from Justin (written in c++)
-filepath = "AraOut_4.txt"
-with open(filepath) as fp:
-    line = fp.readline()
-    while line:
-        if "Veff(water eq.) : " in line:
-            Veff1 = float(line.split()[4])
-            Veff2 = float(line.split()[6])
-        elif "And Veff(water eq.) error plus :" in line:
-            Err1 = float(line.split()[6])
-            Err2 = float(line.split()[11])
-        line = fp.readline()
-"""
-filename = "AraOut_4.txt"
-fp = open(g.source + "/" + filename, "rw+")
-line = fp.readlines()
-while line:
-	if "test Veff(ice) : " in line:
-		Veff = float(line.split()[4])
-	elif "And Veff(water eq.) error plus :" in line:
-		Err_plus = float(line.split()[7])
-		Err_minus = float(line.split()[12])
-	line = fp.readline()
+Veff = []
+Err_plus = []
+Err_minus = []
+VeffArray = []
+Err_plusArray = []
+Err_minusArray = []
 
-plt.figure(figsize = (10, 6))
+tempVeff = []
+tempErr_plus = []
+tempErr_minus = []
 
-plt.xaxis("Generation")
-plt.yaxis("Veff")
-plt.errorbar(numGens, Veff, yerr = [Err_plus, Err_minus])
+for ind in range(1,g.NPOP+1):
+    for gen in range(g.numGens):
+        filename = "AraOut_{}_{}.txt".format(gen, ind)
+        #print(filename)
+        #fp = open(g.source + "/" + filename, "rw+")
+        fp = open(g.source + "/" + filename)
+        #line = fp.readlines()
+        #print(line)
+        for line in fp:
+            if "test Veff(ice) : " in line:
+                    Veff = float(line.split()[3])
+            elif "And Veff(water eq.) error plus :" in line:
+                    Err_plus = float(line.split()[6])
+                    Err_minus = float(line.split()[11])
+            line = fp.readline()
+        tempVeff.append(Veff)
+        tempErr_plus.append(Err_plus)
+        tempErr_minus.append(Err_minus)
+    VeffArray.append(tempVeff)
+    Err_plusArray.append(tempErr_plus)
+    Err_minusArray.append(tempErr_minus)
+    tempVeff = []
+    tempErr_plus = []
+    tempErr_minus = []
 
+
+genAxis = np.linspace(0,g.numGens-1,g.numGens)
+
+for ind in range(g.NPOP):
+    LabelName = "Individual {}".format(ind+1)
+    plt.errorbar(genAxis, VeffArray[ind], yerr = [Err_minusArray[ind],Err_plusArray[ind]], label = LabelName)
+  
+plt.xlabel('Generation')
+plt.ylabel('Length [cm]')
+plt.title("Veff over Generations (0 - {})".format(int(g.numGens-1)))
+plt.legend()
+plt.savefig(g.destination + "/Veff_plot.png")
+#plt.show()
+# was commented out to prevent graph from popping up and block=False replaced it along with plt.pause
+# the pause functions for how many seconds to wait until it closes graph
+plt.show(block=False)
+plt.pause(2)

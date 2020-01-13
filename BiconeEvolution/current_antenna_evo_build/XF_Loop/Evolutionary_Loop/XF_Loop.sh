@@ -22,9 +22,9 @@
 
 ####### LINES TO CHECK OVER WHEN STARTING A NEW RUN ###############################################################################################
 
-RunName='Machtay_12_13_19'           ## Replace when needed
-TotalGens=0   			## number of generations (after initial) to run through
-NPOP=1 				## number of individuals per generation; please keep this value below 99
+RunName='Patton_1_10_20(2)'           ## Replace when needed
+TotalGens=2   			## number of generations (after initial) to run through
+NPOP=10 				## number of individuals per generation; please keep this value below 99
 FREQ=60 			## frequencies being iterated over in XF (Currectly only affects the output.xmacro loop)
 NNT=1000                          ##Number of Neutrinos Thrown in AraSim   
 exp=21				#exponent of the energy for the neutrinos in AraSim
@@ -275,6 +275,9 @@ done
 
 cp /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Antenna_Performance_Metric/AraOut_ActualBicone.txt /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Run_Outputs/$RunName/AraOut_ActualBicone.txt
 
+#Plotting software for Veff(for each individual) vs Generation
+#python Veff_Plotting.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $TotalGens $NPOP
+
 ########  Fitness Score Generation (E)  ######################################################################################################### 
 #
 #
@@ -306,8 +309,8 @@ cd "$WorkingDir"
 rm runData.csv
 python gensData.py 0
 cd Antenna_Performance_Metric
-python LRPlot.py "$WorkingDir" "$WorkingDir"/Run_Outputs/$RunName 1 $NPOP
-#python LRTPlot.py "$WorkingDir" "$WorkingDir"/Run_Outputs/$RunName 1 $NPOP
+#python LRPlot.py "$WorkingDir" "$WorkingDir"/Run_Outputs/$RunName 1 $NPOP
+python LRTPlot.py "$WorkingDir" "$WorkingDir"/Run_Outputs/$RunName 1 $NPOP
 cd ..
 # Note: gensData.py floats around in the main dir until it is moved to 
 # Antenna_Performance_Metric
@@ -337,6 +340,9 @@ echo 'Congrats on getting a fitness score!'
 cd Antenna_Performance_Metric
 # Format is source directory (where is generationDNA.csv), destination directory (where to put plots), npop
 python FScorePlot.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $NPOP
+
+#
+
 cd "$WorkingDir"
 
 echo 'Congrats on getting some nice plots!'
@@ -503,6 +509,9 @@ do
 	    cp AraOut_${i}.txt Run_Outputs/$RunName/AraOut_${gen}_${i}.txt
 
 	done
+        
+	#Plotting software for Veff(for each individual) vs Generation                                                                                       
+        #python Veff_Plotting.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $TotalGens $NPOP
 
 ############## 
 ### Part E ###
@@ -534,8 +543,8 @@ do
 	#python LRTPlot.py "$WorkingDir" "$WorkingDir"/Run_Outputs/$RunName $[gen+1] $NPOP
 #since I'm not positive the above line works I'm gonna do it a little differently
 	next_gen=$((gen+1))
-	python LRPlot.py "$WorkingDir" "$WorkingDir"/Run_Outputs/$RunName $next_gen $NPOP
-	#python LRTPlot.py "$WorkingDir" "$WorkingDir"/Run_Outputs/$RunName $next_gen $NPOP
+	#python LRPlot.py "$WorkingDir" "$WorkingDir"/Run_Outputs/$RunName $next_gen $NPOP
+	python LRTPlot.py "$WorkingDir" "$WorkingDir"/Run_Outputs/$RunName $next_gen $NPOP
 	#Here's how we get the plots for the Veff of each of the antennas
 
 	cd ..

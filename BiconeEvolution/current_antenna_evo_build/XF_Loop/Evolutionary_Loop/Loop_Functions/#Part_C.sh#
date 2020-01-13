@@ -1,0 +1,50 @@
+#!/bin/bash
+
+#this will contain part C of the loop
+
+
+
+########  XF output conversion code (C)  ###############################################################
+#
+#
+#         1. Converts .uan file from XF into a readable .dat file that Arasim can take in.
+#
+#
+########################################################################################################
+
+
+
+if [ $gen -eq 0 ]
+then
+	echo
+	#read -p "Press any key to continue... " -n1 -s
+	echo
+	echo "Resuming..."
+	echo
+
+	cd "$WorkingDir"
+	cd Antenna_Performance_Metric
+
+	## Run AraSim -- feeds the plots into AraSim 
+	## First we convert the plots from XF into AraSim readable files, then we move them to AraSim directory and execute AraSim
+
+
+	python XFintoARA.py $NPOP 
+
+	chmod -R 770 $WorkingDir
+else
+#read -p "Press any key to continue... " -n1 -s
+	echo "Resuming..."
+	echo
+
+
+	## Run AraSim -- feeds the plots into AraSim 
+	## First we convert the plots from XF into AraSim readable files, then we move them to AraSim directory and execute AraSim
+
+	cd "$WorkingDir"
+	cd Antenna_Performance_Metric
+
+	python XFintoARA.py $NPOP
+
+	chmod -R 770 $WorkingDir
+fi
