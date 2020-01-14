@@ -31,7 +31,26 @@ NPOP = len(fScoresInd)
 
 genAxis = np.linspace(0,g.numGens,g.numGens+1)
 
+Veff_ARA = []
+Err_plus_ARA = []
+Err_minus_ARA = []
+Veff_ARA_Ref = []
+
+filenameActual = "/AraOut_ActualBicone.txt"
+fpActual = open(g.source + filenameActual)
+for line in fpActual:
+    if "test Veff(ice) : " in line:
+        Veff_ARA = float(line.split()[3])
+        #print(Veff_ARA)
+    elif "And Veff(water eq.) error plus :" in line:
+        Err_plus_ARA = float(line.split()[6])
+        Err_minus_ARA = float(line.split()[11])
+#    line = fpActual.readline()
+    #print(line)
+Veff_ARA_Ref = Veff_ARA * np.ones(len(genAxis))
+
 plt.figure()
+plt.plot(genAxis, Veff_ARA_Ref, label = "ARA Reference", linestyle= '--', color = 'k')
 for ind in range(NPOP):
     LabelName = "Individual {}".format(ind+1)
     plt.plot(genAxis, fScoresInd[ind], label = LabelName)
@@ -61,4 +80,4 @@ plt.savefig(g.destination + Plot3DName)
 # was commented out to prevent graph from popping up and block=False replaced it along with plt.pause
 # the pause functions for how many seconds to wait until it closes graph
 plt.show(block=False)
-plt.pause(2)
+plt.pause(10)

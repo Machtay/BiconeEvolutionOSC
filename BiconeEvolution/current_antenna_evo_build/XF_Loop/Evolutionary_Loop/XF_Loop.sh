@@ -22,9 +22,9 @@
 
 ####### LINES TO CHECK OVER WHEN STARTING A NEW RUN ###############################################################################################
 
-RunName='Patton_1_10_20(2)'           ## Replace when needed
+RunName='Machtay_1_14_20'           ## Replace when needed
 TotalGens=2   			## number of generations (after initial) to run through
-NPOP=10 				## number of individuals per generation; please keep this value below 99
+NPOP=1 				## number of individuals per generation; please keep this value below 99
 FREQ=60 			## frequencies being iterated over in XF (Currectly only affects the output.xmacro loop)
 NNT=1000                          ##Number of Neutrinos Thrown in AraSim   
 exp=21				#exponent of the energy for the neutrinos in AraSim
@@ -240,6 +240,10 @@ done
 #This submits the job for the actual ARA bicone. Veff depends on Energy and we need this to run once per run to compare it to. 
 qsub AraSimBiconeActual.sh 
 
+#sometimes we have stray files in AraSimFlags (like if we stop the loop midway)
+#the next command clears them so that the we have no files in there 
+rm AraSimFlags/*
+
 cd $WorkingDir/AraSimFlags/
 nFiles=0
 while [ "$nFiles" != "$NPOP" ]
@@ -276,7 +280,7 @@ done
 cp /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Antenna_Performance_Metric/AraOut_ActualBicone.txt /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Run_Outputs/$RunName/AraOut_ActualBicone.txt
 
 #Plotting software for Veff(for each individual) vs Generation
-#python Veff_Plotting.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $TotalGens $NPOP
+python Veff_Plotting.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $TotalGens $NPOP
 
 ########  Fitness Score Generation (E)  ######################################################################################################### 
 #
@@ -339,9 +343,8 @@ echo 'Congrats on getting a fitness score!'
 
 cd Antenna_Performance_Metric
 # Format is source directory (where is generationDNA.csv), destination directory (where to put plots), npop
-python FScorePlot.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $NPOP
-
-#
+#python FScorePlot.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $NPOP
+python FScorePlot.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $TotalGens
 
 cd "$WorkingDir"
 
@@ -511,7 +514,7 @@ do
 	done
         
 	#Plotting software for Veff(for each individual) vs Generation                                                                                       
-        #python Veff_Plotting.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $TotalGens $NPOP
+        python Veff_Plotting.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $TotalGens $NPOP
 
 ############## 
 ### Part E ###
@@ -572,7 +575,8 @@ do
    
 
     # Format is source directory (where is generationDNA.csv), destination directory (where to put plots), npop
-	python FScorePlot.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $NPOP
+	#python FScorePlot.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $NPOP
+	python FScorePlot.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $TotalGens
 	cd "$WorkingDir"
 	
 	echo 'Congrats on getting some nice plots!'

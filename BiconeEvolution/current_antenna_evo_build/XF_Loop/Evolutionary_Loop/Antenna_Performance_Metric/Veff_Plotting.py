@@ -22,21 +22,27 @@ tempVeff = []
 tempErr_plus = []
 tempErr_minus = []
 
+Veff_ARA = []
+Err_plus_ARA = []
+Err_minus_ARA = []
+Veff_ARA_Ref = []
+
 for ind in range(1,g.NPOP+1):
     for gen in range(g.numGens):
-        filename = "AraOut_{}_{}.txt".format(gen, ind)
-        #print(filename)
+        filename = "/AraOut_{}_{}.txt".format(gen, ind)
+#        print(filename)
+ #       print(g.source)
         #fp = open(g.source + "/" + filename, "rw+")
-        fp = open(g.source + "/" + filename)
+        fp = open(g.source + filename)
         #line = fp.readlines()
         #print(line)
         for line in fp:
             if "test Veff(ice) : " in line:
-                    Veff = float(line.split()[3])
+                Veff = float(line.split()[3])
             elif "And Veff(water eq.) error plus :" in line:
                     Err_plus = float(line.split()[6])
                     Err_minus = float(line.split()[11])
-            line = fp.readline()
+#            line = fp.readline()
         tempVeff.append(Veff)
         tempErr_plus.append(Err_plus)
         tempErr_minus.append(Err_minus)
@@ -46,9 +52,26 @@ for ind in range(1,g.NPOP+1):
     tempVeff = []
     tempErr_plus = []
     tempErr_minus = []
+fp.close()
 
+filenameActual = "/AraOut_ActualBicone.txt"
+fpActual = open(g.source + filenameActual)
+for line in fpActual:
+ #   print(line)
+    if "test Veff(ice) : " in line:
+        Veff_ARA = float(line.split()[3])
+    elif "And Veff(water eq.) error plus :" in line:
+        Err_plus_ARA = float(line.split()[6])
+        Err_minus_ARA = float(line.split()[11])
+#    line = fpActual.readline()
+fpActual.close()
 
 genAxis = np.linspace(0,g.numGens-1,g.numGens)
+#print(genAxis)
+#print(Veff_ARA)
+
+Veff_ARA_Ref = Veff_ARA * np.ones(len(genAxis))
+plt.plot(genAxis, Veff_ARA_Ref, label = "ARA Reference", linestyle= '--', color = 'k')
 
 for ind in range(g.NPOP):
     LabelName = "Individual {}".format(ind+1)
@@ -63,4 +86,4 @@ plt.savefig(g.destination + "/Veff_plot.png")
 # was commented out to prevent graph from popping up and block=False replaced it along with plt.pause
 # the pause functions for how many seconds to wait until it closes graph
 plt.show(block=False)
-plt.pause(2)
+plt.pause(15)
