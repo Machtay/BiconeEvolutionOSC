@@ -80,4 +80,4 @@ plt.savefig(g.destination + Plot3DName)
 # was commented out to prevent graph from popping up and block=False replaced it along with plt.pause
 # the pause functions for how many seconds to wait until it closes graph
 plt.show(block=False)
-plt.pause(10)
+plt.pause(15)

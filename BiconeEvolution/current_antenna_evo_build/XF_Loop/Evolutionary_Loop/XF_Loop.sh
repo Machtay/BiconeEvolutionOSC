@@ -22,12 +22,12 @@
 
 ####### LINES TO CHECK OVER WHEN STARTING A NEW RUN ###############################################################################################
 
-RunName='Machtay_1_14_20'           ## Replace when needed
-TotalGens=2   			## number of generations (after initial) to run through
-NPOP=1 				## number of individuals per generation; please keep this value below 99
+RunName='Machtay_Pls_Work'           ## Replace when needed
+TotalGens=10			## number of generations (after initial) to run through
+NPOP=2				## number of individuals per generation; please keep this value below 99
 FREQ=60 			## frequencies being iterated over in XF (Currectly only affects the output.xmacro loop)
-NNT=1000                          ##Number of Neutrinos Thrown in AraSim   
-exp=21				#exponent of the energy for the neutrinos in AraSim
+NNT=100000                          ##Number of Neutrinos Thrown in AraSim   
+exp=18				#exponent of the energy for the neutrinos in AraSim
 ScaleFactor=1.0                   ##ScaleFactor used when punishing fitness scores of antennae larger than holes used in fitnessFunctoin_ARA.cpp
 #####################################################################################################################################################
 
@@ -280,7 +280,9 @@ done
 cp /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Antenna_Performance_Metric/AraOut_ActualBicone.txt /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Run_Outputs/$RunName/AraOut_ActualBicone.txt
 
 #Plotting software for Veff(for each individual) vs Generation
-python Veff_Plotting.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $TotalGens $NPOP
+#I changed from the below comment to the current version because the plots can only go up to the current number of generations, not the total number of generations
+#python Veff_Plotting.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $TotalGens $NPOP
+python Veff_Plotting.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName 0 $NPOP
 
 ########  Fitness Score Generation (E)  ######################################################################################################### 
 #
@@ -344,7 +346,9 @@ echo 'Congrats on getting a fitness score!'
 cd Antenna_Performance_Metric
 # Format is source directory (where is generationDNA.csv), destination directory (where to put plots), npop
 #python FScorePlot.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $NPOP
-python FScorePlot.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $TotalGens
+#I've changed the below to the new version because the fitness score can only be calculated for up to the current gen, not all generations
+#python FScorePlot.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $TotalGens
+python FScorePlot.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName 0
 
 cd "$WorkingDir"
 
@@ -376,7 +380,8 @@ do
 
 	cd "$WorkingDir"
 	./roulette_algorithm.exe cont $NPOP
-
+	#When do we need to use ${gen} vs $gen? Seems to me like it would make sense if the distinction was about being in quoates or not
+	#I wonder if putting it in braces as below is problematic
 	cp generationDNA.csv Run_Outputs/$RunName/${gen}_generationDNA.csv
 
 #we can make a function that does this with the flag $gen
@@ -494,7 +499,7 @@ do
 	
 	cd $WorkingDir/AraSimFlags/
 	nFiles=0
-	while [ "$nFiles" != "$NPOP"+1]
+	while [ "$nFiles" != "$NPOP"+1 ]
 	do
 		echo "Waiting for AraSim jobs to finish..."
 		sleep 60
@@ -513,8 +518,10 @@ do
 
 	done
         
-	#Plotting software for Veff(for each individual) vs Generation                                                                                       
-        python Veff_Plotting.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $TotalGens $NPOP
+	#Plotting software for Veff(for each individual) vs Generation
+	#I've changed the line from the comment below to what it is currently because we want to use gens instead of total gens--each time we make the plot we can only get up to the current gen number
+        #python Veff_Plotting.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $TotalGens $NPOP
+	python Veff_Plotting.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $gen $NPOP
 
 ############## 
 ### Part E ###
@@ -576,7 +583,9 @@ do
 
     # Format is source directory (where is generationDNA.csv), destination directory (where to put plots), npop
 	#python FScorePlot.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $NPOP
-	python FScorePlot.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $TotalGens
+	#I'm changing from the comment below to the current version because we can only go up to the current gen
+	#python FScorePlot.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $TotalGens
+	python FScorePlot.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $gen	
 	cd "$WorkingDir"
 	
 	echo 'Congrats on getting some nice plots!'

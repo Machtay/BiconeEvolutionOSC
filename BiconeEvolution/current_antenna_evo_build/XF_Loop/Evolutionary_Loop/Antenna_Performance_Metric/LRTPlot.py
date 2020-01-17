@@ -131,7 +131,7 @@ axT.legend()
 
 plt.savefig(g.destination + "/" + PlotName)
 plt.show(block=False)
-plt.pause(2)
+plt.pause(15)
 
 
 

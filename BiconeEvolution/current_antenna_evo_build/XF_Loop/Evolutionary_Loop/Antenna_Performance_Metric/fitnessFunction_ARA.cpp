@@ -38,6 +38,8 @@ int main(int argc, char** argv)
 	NPOP = atoi(argv[1]); // The atoi function converts from string to int
 	double scaleFactor = stod(argv[2]);
 	char* antennaFile = argv[3];
+	//Don't worry about the fact that the loop passes 4 arguments and this declares 3!
+	//We call it later in the read function using argv[indivial+3] to read the input file
 	// Quick variable declarations:
 	vector<double> fitnessScores (NPOP, 0.0); // Stores our fitness scores for each individual.
 	string *araLineArray = NULL; // Stores the actual lines read in from the .txt files.
