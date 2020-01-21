@@ -19,7 +19,7 @@ RunName=$4
 ScaleFactor=$5
 AntennaRadii=$6
 
-chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
+#chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
 
 cd Antenna_Performance_Metric
 
@@ -61,4 +61,4 @@ done
 
 echo 'Congrats on getting a fitness score!'
 
-chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
+#chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/

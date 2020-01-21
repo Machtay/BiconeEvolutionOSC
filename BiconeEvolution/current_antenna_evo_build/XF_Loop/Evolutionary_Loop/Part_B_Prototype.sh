@@ -23,6 +23,7 @@ WorkingDir=$3
 RunName=$4
 XmacrosDir=$5
 XFProj=$6
+m=$7
 
 #chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
 
@@ -46,25 +47,37 @@ rm simulation_PEC.xmacro
 echo "$line1" > output.xmacro
 echo "$line2" >> output.xmacro
 echo "$line3" >> output.xmacro
+echo "var m = $m;" >> output.xmacro
 echo "var NPOP = $NPOP;" >> output.xmacro
-cat outputmacroskeleton.txt >> output.xmacro
+cat outputmacroskeleton_prototype.txt >> output.xmacro
 
 # Building the simulation_PEC.xmacro is a bit simpler. Cat the first skeleton, add the gridsize from datasize.txt, and cat the second skeleton
 
+echo "var m = $m;" >> simulation_PEC.xmacro
 echo "var NPOP = $NPOP;" >> simulation_PEC.xmacro
-if [ $gen -eq 0 ]
+
+if [[ $gen -eq 0 && $m -eq 1 ]]
 then
 	echo "App.saveCurrentProjectAs(\"/fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Run_Outputs/$RunName/$RunName\");" >> simulation_PEC.xmacro
 fi
 
-cat simulationPECmacroskeleton.txt >> simulation_PEC.xmacro 
+cat simulationPECmacroskeleton_prototype.txt >> simulation_PEC.xmacro 
 cd "$WorkingDir"
 
 cd $XmacrosDir 
 
 #The above line needs to be fixed(Says who? when? Julie 12/25/19)
 
-cat simulationPECmacroskeleton2.txt >> simulation_PEC.xmacro
+cat simulationPECmacroskeleton2_prototype.txt >> simulation_PEC.xmacro
+
+#the if statement was in the looping part of XF_Loop.sh but not in the 0 generation part
+#I am not positive that we need them, but I'm putting them in to see if they resolve an error
+#Machtay 1/19/20
+if [[ $gen -ne 0 && $m -eq 1 ]]
+then
+	cd $XFProj
+	rm -rf Simulations
+fi
 
 echo
 echo
@@ -79,12 +92,10 @@ echo '3. Close XF'
 module load xfdtd
 xfdtd $XFProj --execute-macro-script=/fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Xmacros/simulation_PEC.xmacro || true
 
+#The following line is commented out because we want to put the looping part in the master loop
+cd $XFProj/Simulations/00000$m/Run0001/
+xfsolver -t=35 -v #--use-xstream #xstream
 
-for i in `seq 1 $NPOP`
-do
-	cd $XFProj/Simulations/00000$i/Run0001/
-	xfsolver -t=35 -v
-done
 
 cd $WorkingDir
 	

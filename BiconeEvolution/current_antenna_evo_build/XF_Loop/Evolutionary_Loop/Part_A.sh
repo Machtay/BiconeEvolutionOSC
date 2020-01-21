@@ -19,7 +19,7 @@ NPOP=$2
 WorkingDir=$3
 RunName=$4
 
-chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
+#chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
 
 cd "$WorkingDir"
 if [ $gen -eq 0 ]
@@ -33,4 +33,6 @@ fi
 
 cp generationDNA.csv Run_Outputs/$RunName/${gen}_generationDNA.csv
 
-chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
+#chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
+
+

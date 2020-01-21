@@ -1,7 +1,8 @@
 var query = new ResultQuery();
 ///////////////////////Get Theta and Phi Gain///////////////
 query.projectId = App.getActiveProject().getProjectDirectory();
-var NPOP = 1;
+var m = 1;
+var NPOP = 2;
 for (var k = 1; k <= NPOP; k++){
 var simNum = "0000"
 if( k < 10){
@@ -10,6 +11,7 @@ var simNum = simNum + "0" + k;
 else{
 var simNum = simNum + k;
 }
+if( k==m){
 query.runId = "Run0001";
 query.simulationId = simNum;
 query.sensorType = ResultQuery.FarZoneSensor;
@@ -95,6 +97,7 @@ var file = "/fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_anten
 file = file + k + "_";
 file = file + (i+1) + ".uan";
 FarZoneUtils.exportToUANFile(thdata,thphase,phdata,phphase,inputpower,file, i);
+}
 }
 }
 App.quit();

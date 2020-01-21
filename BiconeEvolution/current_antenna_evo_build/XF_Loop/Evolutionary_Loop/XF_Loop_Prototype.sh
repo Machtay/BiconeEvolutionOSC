@@ -22,11 +22,11 @@
 
 ####### LINES TO CHECK OVER WHEN STARTING A NEW RUN ###############################################################################################
 
-RunName='Machtay_1_19_12'           ## Replace when needed
+RunName='Patton_1_21_20_3'           ## Replace when needed
 TotalGens=2   			## number of generations (after initial) to run through
-NPOP=3				## number of individuals per generation; please keep this value below 99
+NPOP=2				## number of individuals per generation; please keep this value below 99
 FREQ=60 			## frequencies being iterated over in XF (Currectly only affects the output.xmacro loop)
-NNT=10000                         ##Number of Neutrinos Thrown in AraSim   
+NNT=1000                        ##Number of Neutrinos Thrown in AraSim   
 exp=18				#exponent of the energy for the neutrinos in AraSim
 ScaleFactor=1.0                   ##ScaleFactor used when punishing fitness scores of antennae larger than holes used in fitnessFunctoin_ARA.cpp
 #####################################################################################################################################################
@@ -54,29 +54,43 @@ if ! [ -f "${saveStateFile}" ]; then
 	
     echo 0 > $RunName.savestate.txt
     echo 0 >> $RunName.savestate.txt
+    echo 1 >> $RunName.savestate.txt
 fi
 cd ..
 
 ## Read current state of loop ##
-line=0
+line=1
 while read p; do
-	if [ $line -eq 0 ]
+	if [ $line -eq 1 ]
 	then
 		InitialGen=$p
 		echo "${p}"
 
 	fi
 	
-	if [ $line -eq 1 ]
+	if [ $line -eq 2 ]
 	then
 		state=$p
 		echo "${p}"
 		line=2
 	fi
-
-	if [ $line -eq 0 ]
+	
+	if [ $line -eq 3 ]
 	then
-		line=1
+	        indiv=$p
+		echo "${p}"
+		line=3
+	fi
+
+	if [ $line -eq 1 ]
+	then
+		line=2
+
+	fi
+
+	if [ $line -eq 2 ]
+	then
+		line=3
 
 	fi
 	
@@ -84,6 +98,7 @@ while read p; do
 done <saveStates/$saveStateFile
 ## THE LOOP ##
 echo "${state}"
+#InitialGen=${gen}
 
 for gen in `seq $InitialGen $TotalGens`
 do
@@ -94,8 +109,8 @@ do
 	if [[ $gen -eq 0 && $state -eq 0 ]]
 	then
 		# Make the run name directory
-		mkdir -m 777 $WorkingDir/Run_Outputs/$RunName
-		mkdir -m 777 $WorkingDir/Run_Outputs/$RunName/AraSimFlags
+		mkdir -m777 $WorkingDir/Run_Outputs/$RunName
+		mkdir -m777 $WorkingDir/Run_Outputs/$RunName/AraSimFlags
 		# Create the run's date and save it in the run's directory
 		python dateMaker.py
 		mv "runDate.txt" "$WorkingDir/Run_Outputs/$RunName/" -f
@@ -110,32 +125,54 @@ do
 	then
 	        ./Part_A.sh $gen $NPOP $WorkingDir $RunName
 		state=2
-		./SaveState.sh $gen $state $RunName
+		./SaveState_Prototype.sh $gen $state $RunName $indiv
 		#./Part_A.sh $gen $NPOP $WorkingDir $RunName
 
 
 	fi
 
-
+#########Commenting the below out--we shouldn't be looping this way######################
 	## Part B ##
+	#We need to change this so that instead of having the loop inside of Part B we loop over Part B
 	if [ $state -eq 2 ]
 	then
-	        ./Part_B.sh $gen $NPOP $WorkingDir $RunName $XmacrosDir $XFProj
-		state=3
-		./SaveState.sh $gen $state $RunName
-		#./Part_B.sh $gen $NPOP $WorkingDir $RunName $XmacrosDir $XFProj
+		for i in `seq $indiv $NPOP`
+		do
 
+	        	./Part_B_Prototype.sh $gen $NPOP $WorkingDir $RunName $XmacrosDir $XFProj $i
+			if [ $i -ne $NPOP ]
+			then
+				state=2
+			else
+				state=3
+			       
+			fi
+			./SaveState_Prototype.sh $gen $state $RunName $i
+			#./Part_B.sh $gen $NPOP $WorkingDir $RunName $XmacrosDir $XFProj
+		done
 	fi
+###############################End commenting out##########################################
+	
 
+#####################Substituting this in for the above commented out stuff################
+#	if [ $state -eq 2 ]
+#	then
+#		./Part_B_Prototype.sh $gen $NPOP $WorkingDir $RunName $XmacrosDir $XFProj 1
+#		state=3
+#		./SaveState_Prototype.sh $gen $state $RunName $indiv
+#	fi
+
+
+#######################################End substitution###############################
 
 	## Part C ##
 	if [ $state -eq 3 ]
 	then
-
+	        #$indiv=1
 	        ./Part_C.sh $NPOP $WorkingDir
 		state=4
 
-		./SaveState.sh $gen $state $RunName
+		./SaveState_Prototype.sh $gen $state $RunName $indiv
 		#./Part_C.sh $NPOP $WorkingDir
 
 
@@ -145,10 +182,11 @@ do
 	if [ $state -eq 4 ]
 	then
 	        #The reason here why Part_D1.sh is run after teh save state is changed is because all Part_D1 does is submit AraSim jobs which are their own jobs and run on their own time
+		#We need to make a new AraSim job script which takes the runname as a flag 
 		state=5
 
-		./SaveState.sh $gen $state $RunName
-		./Part_D1.sh $gen $NPOP $WorkingDir $AraSimExec $exp $NNT
+		./SaveState_Prototype.sh $gen $state $RunName $indiv
+		./Part_D1.sh $gen $NPOP $WorkingDir $AraSimExec $exp $NNT $RunName
 
 	fi
 
@@ -157,7 +195,7 @@ do
 	then
 	        ./Part_D2.sh $gen $NPOP $WorkingDir $RunName
 		state=6
-		./SaveState.sh $gen $state $RunName
+		./SaveState_Prototype.sh $gen $state $RunName $indiv
 		#./Part_D2.sh $gen $NPOP $WorkingDir $RunName
 
 
@@ -168,7 +206,7 @@ do
 	then
 	        ./Part_E.sh $gen $NPOP $WorkingDir $RunName $ScaleFactor $AntennaRadii
 		state=7
-		./SaveState.sh $gen $state $RunName
+		./SaveState_Prototype.sh $gen $state $RunName $indiv
 		#./Part_E.sh $gen $NPOP $WorkingDir $RunName $ScaleFactor $AntennaRadii
 
 	fi
@@ -178,7 +216,7 @@ do
 	then
 	        ./Part_F.sh $NPOP $WorkingDir $RunName
 		state=1
-		./SaveState.sh $gen $state $RunName
+		./SaveState_Prototype.sh $gen $state $RunName $indiv
 
 		#./Part_F.sh $NPOP $WorkingDir $RunName
 
@@ -201,3 +239,5 @@ mv runData.csv Antenna_Performance_Metric
 ########################################################################################################################
 cd "$WorkingDir"
 mv AraOut_ActualBicone.txt "$WorkingDir"/Run_Outputs/$RunName/AraOut_ActualBicone.txt
+
+

@@ -18,8 +18,9 @@ WorkingDir=$3
 AraSimExec=$4
 exp=$5
 NNT=$6
+RunName=$7
 
-chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
+#chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
 
 cd Antenna_Performance_Metric
 for i in `seq 1 $NPOP`
@@ -48,7 +49,8 @@ do
         sed -e "s/num_nnu/$NNT/" -e "s/n_exp/$exp/" /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup_dummy.txt > /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup.txt
 	#We will want to call a job here to do what this AraSim call is doing so it can run in parallel
 	cd $WorkingDir
-	qsub -v num=$i AraSimCall.sh
+	#qsub -v num=$i AraSimCall.sh
+	qsub -v num=$i -v WorkingDir=$WorkingDir -v RunName=$RunName AraSimCall_Prototype.sh
 
 	rm outputs/*.root
 	
@@ -57,12 +59,13 @@ done
 #This submits the job for the actual ARA bicone. Veff depends on Energy and we need this to run once per run to compare it to. 
 if [ $gen -eq 0 ]
 then
-	qsub AraSimBiconeActual.sh 
+	qsub -v WorkingDir=$WorkingDir -v RunName=$RunName AraSimBiconeActual_Prototype.sh 
+
 fi
 #Any place we see the directory AraSimFlags we need to change that so that AraSimFlags is a directory under the runname directory
 #cd $WorkingDir/AraSimFlags/
 
 #we moved the wait function from here to the Part_D1.sh file
 
-chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
+#chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
 

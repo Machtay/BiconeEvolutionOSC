@@ -10,7 +10,7 @@
 NPOP=$1
 WorkingDir=$2
 
-chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
+#chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
 
 cd "$WorkingDir"
 cd Antenna_Performance_Metric
@@ -21,4 +21,4 @@ cd Antenna_Performance_Metric
 
 python XFintoARA.py $NPOP 
 
-chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
+#chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/

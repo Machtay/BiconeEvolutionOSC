@@ -11,7 +11,7 @@ NPOP=$1
 WorkingDir=$2
 RunName=$3
 
-chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
+#chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
 
 # Current Plotting Software
 
@@ -25,4 +25,4 @@ cd "$WorkingDir"
 
 echo 'Congrats on getting some nice plots!'
 
-chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
+#chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
