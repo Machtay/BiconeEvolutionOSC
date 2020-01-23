@@ -20,16 +20,20 @@ Plot3DName = "/FScorePlot3D.png"
 fileReadTemp = []
 fScoresGen = []
 fScoresInd = []
-
+#We may want to only have g.numGens and not g.numGens+1
 for gen in range(g.numGens+1):
     filename = "/{}_fitnessScores.csv".format(gen)
-    fileReadTemp = np.genfromtxt(g.source + filename, delimiter=',')
+    #fileReadTemp = np.genfromtxt(g.source + filename, delimiter=',')
+    #The above comment was here orignally but the delimiter is no longer a comma so the next line should work with new line
+    #fileReadTemp = (line.rstrip('\n') for line in open(g.source + filename))
+    #fScoresGen.append(fileReadTemp[2:])
+    with open(g.source + filename, "r") as f:
+        fileReadTemp = [line.strip() for line in f]
     fScoresGen.append(fileReadTemp[2:])
-
 fScoresInd = np.transpose(fScoresGen)
 NPOP = len(fScoresInd)
 
-genAxis = np.linspace(0,g.numGens,g.numGens+1)
+genAxis = np.linspace(0,g.numGens,g.numGens+1,endpoint=True)
 
 Veff_ARA = []
 Err_plus_ARA = []
@@ -47,30 +51,36 @@ for line in fpActual:
         Err_minus_ARA = float(line.split()[11])
 #    line = fpActual.readline()
     #print(line)
-Veff_ARA_Ref = Veff_ARA * np.ones(len(genAxis))
+Veff_ARA_Ref = Veff_ARA/(10**9) * np.ones(len(genAxis))
 
 plt.figure()
 plt.plot(genAxis, Veff_ARA_Ref, label = "ARA Reference", linestyle= '--', color = 'k')
 for ind in range(NPOP):
     LabelName = "Individual {}".format(ind+1)
+    #multiply fScoresInd by 10^9 because it is in km^3 instead of m
+   
     plt.plot(genAxis, fScoresInd[ind], label = LabelName)
-  
+
 plt.xlabel('Generation')
-plt.ylabel('Fitness Score')
-plt.title("Fitness Score over Generations (0 - {})".format(int(g.numGens-1)))
+plt.ylabel('Fitness Score(10^9)')
+plt.title("Fitness Score over Generations (0 - {})".format(int(g.numGens)))
 plt.legend()
 plt.savefig(g.destination + Plot2DName)
+
+#for x in range (len(fScoresInd[1])):
+    #print fScoresInd[1][x]
+
 #plt.show()
 # was commented out to prevent graph from popping up and block=False replaced it along with plt.pause
 # the pause functions for how many seconds to wait until it closes graph
 plt.show(block=False)
-plt.pause(2)
+plt.pause(15)
 
 plt.figure()
 indAxis = np.linspace(1,NPOP,NPOP)
 genAxis, indAxis = np.meshgrid(genAxis, indAxis)
 ax = plt.axes(projection='3d')
-ax.plot_surface(genAxis, indAxis, fScoresInd, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
+#ax.plot_surface(genAxis, indAxis, fScoresInd, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
 ax.set_title('3D Fitness Score over Generations');
 ax.set_xlabel('Generation')
 ax.set_ylabel('Individual')

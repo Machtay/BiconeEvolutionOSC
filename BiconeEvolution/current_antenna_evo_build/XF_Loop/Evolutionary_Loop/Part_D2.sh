@@ -9,6 +9,7 @@ RunName=$4
 #chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
 
 cd $WorkingDir/Run_Outputs/$RunName/AraSimFlags/
+#cd $WorkingDir/Run_Outputs/AraSimFlags/
 nFiles=0
 
 totPop=$NPOP
@@ -17,6 +18,7 @@ then
 	totPop=$( expr $NPOP + 1 )
 fi
 rm -f $WorkingDir/Run_Outputs/$RunName/AraSimFlags/*
+#rm -f $WorkingDir/Run_Outputs/AraSimFlags/*
 
 while [ "$nFiles" != "$totPop" ]
 do
@@ -34,7 +36,7 @@ do
 done
 
 rm $WorkingDir/Run_Outputs/$RunName/AraSimFlags/*
-
+#rm $WorkingDir/Run_Outputs/AraSimFlags/*
 #file check delay goes here
 
 wait
@@ -54,7 +56,7 @@ then
 fi
 
 #Plotting software for Veff(for each individual) vs Generation
-#python Veff_Plotting.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $TotalGens $NPOP
+python Veff_Plotting.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $gen $NPOP
 
 #chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
 

@@ -18,6 +18,7 @@ cd /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/
 #if in the job call we have 
 #qsub -v num=$i
 echo a_$num.txt
+chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/outputs/
 ./AraSim setup.txt $num outputs/ a_$num.txt > /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Antenna_Performance_Metric/AraOut_$num.txt
 
 cd $WorkingDir/Run_Outputs/$RunName/AraSimFlags

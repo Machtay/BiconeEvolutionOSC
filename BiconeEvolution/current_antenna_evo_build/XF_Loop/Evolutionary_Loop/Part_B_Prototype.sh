@@ -93,13 +93,27 @@ module load xfdtd
 xfdtd $XFProj --execute-macro-script=/fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Xmacros/simulation_PEC.xmacro || true
 
 #The following line is commented out because we want to put the looping part in the master loop
-cd $XFProj/Simulations/00000$m/Run0001/
-xfsolver -t=35 -v #--use-xstream #xstream
-
+if [ $m -lt 10 ]
+then
+	cd $XFProj/Simulations/00000$m/Run0001/
+	xfsolver -t=35 -v #--use-xstream #xstream
+elif [ $m -ge 10 ]
+then
+	cd $XFProj/Simulations/0000$m/Run0001/
+	xfsolver -t=35 -v #--use-xstream #xstream
+fi
 
 cd $WorkingDir
 	
 xfdtd $XFProj --execute-macro-script=/fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Xmacros/output.xmacro || true
+
+cd $WorkingDir/Antenna_Performance_Metric
+for freq in `seq 1 60`
+    do
+    #Remove if plotting software doesnt need
+    #cp data/$i.uan ${i}uan.csv
+	mv Antenna_Performance_Metric/${m}_${freq}.uan "$WorkingDir"/Run_Outputs/$RunName/${gen}_${i}_${freq}.uan
+    done
 
 #chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
 

@@ -22,11 +22,11 @@
 
 ####### LINES TO CHECK OVER WHEN STARTING A NEW RUN ###############################################################################################
 
-RunName='Patton_1_21_20_3'           ## Replace when needed
-TotalGens=2   			## number of generations (after initial) to run through
-NPOP=2				## number of individuals per generation; please keep this value below 99
+RunName='Rolla_1_22_20'           ## Replace when needed
+TotalGens=10   			## number of generations (after initial) to run through
+NPOP=10				## number of individuals per generation; please keep this value below 99
 FREQ=60 			## frequencies being iterated over in XF (Currectly only affects the output.xmacro loop)
-NNT=1000                        ##Number of Neutrinos Thrown in AraSim   
+NNT=100000                        ##Number of Neutrinos Thrown in AraSim   
 exp=18				#exponent of the energy for the neutrinos in AraSim
 ScaleFactor=1.0                   ##ScaleFactor used when punishing fitness scores of antennae larger than holes used in fitnessFunctoin_ARA.cpp
 #####################################################################################################################################################
@@ -204,7 +204,7 @@ do
 	## Part E ##
 	if [ $state -eq 6 ]
 	then
-	        ./Part_E.sh $gen $NPOP $WorkingDir $RunName $ScaleFactor $AntennaRadii
+	        ./Part_E.sh $gen $NPOP $WorkingDir $RunName $ScaleFactor $AntennaRadii $indiv
 		state=7
 		./SaveState_Prototype.sh $gen $state $RunName $indiv
 		#./Part_E.sh $gen $NPOP $WorkingDir $RunName $ScaleFactor $AntennaRadii

@@ -18,6 +18,7 @@ WorkingDir=$3
 RunName=$4
 ScaleFactor=$5
 AntennaRadii=$6
+indiv=$7
 
 #chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
 
@@ -39,7 +40,16 @@ cp fitnessScores.csv "$WorkingDir"/Run_Outputs/$RunName/${gen}_fitnessScores.csv
 mv fitnessScores.csv "$WorkingDir"
 
 cd "$WorkingDir"
-rm runData.csv
+if [ $gen -eq 0 ]
+then
+	rm runData.csv
+fi
+
+if [ $indiv -eq $NPOP ]
+then
+	mv runData.csv $WorkingDir/Run_Outputs/$RunName/runData_$gen.csv
+fi
+
 python gensData.py $gen
 cd Antenna_Performance_Metric
 next_gen=$((gen+1))
@@ -49,15 +59,15 @@ cd ..
 # Note: gensData.py floats around in the main dir until it is moved to 
 # Antenna_Performance_Metric
 
-for i in `seq 1 $NPOP`
-do
-    for freq in `seq 1 60`
-    do
-    #Remove if plotting software doesnt need
+#for i in `seq 1 $NPOP`
+#do
+#    for freq in `seq 1 60`
+#    do
+#    #Remove if plotting software doesnt need
     #cp data/$i.uan ${i}uan.csv
-	cp Antenna_Performance_Metric/${i}_${freq}.uan "$WorkingDir"/Run_Outputs/$RunName/${gen}_${i}_${freq}.uan
-    done
-done
+#	cp Antenna_Performance_Metric/${i}_${freq}.uan "$WorkingDir"/Run_Outputs/$RunName/${gen}_${i}_${freq}.uan
+#    done
+#done
 
 echo 'Congrats on getting a fitness score!'
 

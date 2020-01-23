@@ -19,6 +19,8 @@ Code Headers:		.uan header: 	Theta, Phi, Gain Theta (dB), Gain Phi (dB), Phase T
 import numpy as np
 # For reading arguments from the terminal or from the bash script
 import argparse 
+#for changing the permissions
+import os
 
 ### GLOBALS ###
 
@@ -46,7 +48,8 @@ datLoc = uanLoc # currently, we are saving files in the same directory
 def readFile(indivNum, freqNum):
     n = 37
     m = 73
-    uanName = uanLoc+str(indivNum)+"_"+str(freqNum)+".uan"
+    #uanName = uanLoc+str(indivNum)+"_"+str(freqNum)+".uan"
+    uanName = g.WorkingDir + "Run_Outputs" + "/" +g.RunName+ "/" + str(g.gen) + "_" + str(indivNum)+"_"+str(freqNum)+".uan"
     f = open(uanName, "r")
 
 
@@ -77,12 +80,17 @@ def readFile(indivNum, freqNum):
 #0 NPOP is taken by argparse from the user or bash script; we set this up first.
 parser = argparse.ArgumentParser()
 parser.add_argument("NPOP", help="How many antennas are being simulated each generation?", type=int)
+#need to add an argument for a new flag for the uan location in the runname directory
+parser.add_argument("WorkingDir", help="Evolutionary_Loop directory", type=str)
+parser.add_argument("RunName", help="Run Name directory where everything will be stored", type=str)
+parser.add_argument("gen", help="The generation the loop is on", type=int)
 g = parser.parse_args()
 # We process each antenna individually, to reduce computer memory stress
 n = 37
 m = 73
 for antenna in range(g.NPOP):
     with open("evol_antenna_model_"+str(antenna+1)+".dat", "w+") as datFile:
+        os.chmod("evol_antenna_model_"+str(antenna+1)+".dat", 0o777)
         for freq in range(numFreq):
             datFile.write(head1_a + str(freqVals[freq])+ head1_b+ '\n')
             datFile.write(head2+ '\n')

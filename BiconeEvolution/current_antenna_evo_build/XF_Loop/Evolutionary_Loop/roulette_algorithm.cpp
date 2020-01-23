@@ -168,13 +168,13 @@ const float INITIAL_MEAN_C1_G1 = 1.0f;//2.0f; // When we initially run, this is 
 
 const float INITIAL_STD_DVN_C1_G1 = 0.25f; //1.0; // When starting a new generation, this is the starting variance for the gene.
 
-// Gene Two, Gene One controls length currently
+// Gene Two, Gene two controls length currently 
 
 const float INITIAL_MEAN_C1_G2 = 7.0f;//50.0f; // When we initially run, this is the average value seeded for the gene.
 
 const float INITIAL_STD_DVN_C1_G2 = 1.0f;//15.0f; // When starting a new generation, this is the starting variance for the gene.
 
-// Gene Three, Gene One controls angle (in radians) currently
+// Gene Three, Gene three controls angle (in radians) currently 
 
 const float INITIAL_MEAN_C1_G3 = M_PI / 4;//8; // When we initially run, this is the average value seeded for the gene.
 

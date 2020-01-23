@@ -29,21 +29,22 @@ Veff_ARA_Ref = []
 #changed for gen in range (g.numGens) to for gen in range(0,g.numGens) (actually undid this) 
 for ind in range(1,g.NPOP+1):
 #going to change from for gen in range(g.numgens) to for gen in range(0, g.numgens)
-    for gen in range(0, g.numGens):
+    for gen in range(0, g.numGens+1):
         filename = "AraOut_{}_{}.txt".format(gen, ind)
 #        print(filename)
  #       print(g.source)
-        #fp = open(g.source + "/" + filename, "rw+")
-        fp = open(g.source + "/" + filename)
+        fp = open(g.source + "/" + filename, "r")
+        #fp = open(g.source + "/" + filename)
         #line = fp.readlines()
         #print(line)
         for line in fp:
             if "test Veff(ice) : " in line:
-                Veff = float(line.split()[3])
+                Veff = float(line.split()[3]) #to me this looks like it's in units of m^3
             elif "And Veff(water eq.) error plus :" in line:
-                    Err_plus = float(line.split()[6])
-                    Err_minus = float(line.split()[11])
+                Err_plus = float(line.split()[6])
+                Err_minus = float(line.split()[11])
 #            line = fp.readline()
+        fp.close()
         tempVeff.append(Veff)
         tempErr_plus.append(Err_plus)
         tempErr_minus.append(Err_minus)
@@ -53,10 +54,10 @@ for ind in range(1,g.NPOP+1):
     tempVeff = []
     tempErr_plus = []
     tempErr_minus = []
-fp.close()
+#fp.close()
 
 filenameActual = "AraOut_ActualBicone.txt"
-fpActual = open(g.source + filenameActual)
+fpActual = open(g.source + "/" + filenameActual)
 for line in fpActual:
  #   print(line)
     if "test Veff(ice) : " in line:
@@ -67,7 +68,7 @@ for line in fpActual:
 #    line = fpActual.readline()
 fpActual.close()
 
-genAxis = np.linspace(0,g.numGens-1,g.numGens)
+genAxis = np.linspace(0,g.numGens,g.numGens+1)
 #print(genAxis)
 #print(Veff_ARA)
 
@@ -80,8 +81,9 @@ for ind in range(g.NPOP):
     plt.errorbar(genAxis, VeffArray[ind], yerr = [Err_minusArray[ind],Err_plusArray[ind]], label = LabelName)
   
 plt.xlabel('Generation')
-plt.ylabel('Length [cm]')
-plt.title("Veff over Generations (0 - {})".format(int(g.numGens-1)))
+#plt.ylabel('Length [cm]')
+plt.ylabel('Fitness Score (Ice Volume) (m^3)')
+plt.title("Veff over Generations (0 - {})".format(int(g.numGens)))
 plt.legend()
 plt.savefig(g.destination + "/" + "Veff_plot.png")
 #plt.show()

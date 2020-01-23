@@ -50,7 +50,7 @@ do
 	#We will want to call a job here to do what this AraSim call is doing so it can run in parallel
 	cd $WorkingDir
 	#qsub -v num=$i AraSimCall.sh
-	qsub -v num=$i -v WorkingDir=$WorkingDir -v RunName=$RunName AraSimCall_Prototype.sh
+	qsub -v num=$i,WorkingDir=$WorkingDir,RunName=$RunName AraSimCall_Prototype.sh
 
 	rm outputs/*.root
 	
@@ -59,7 +59,7 @@ done
 #This submits the job for the actual ARA bicone. Veff depends on Energy and we need this to run once per run to compare it to. 
 if [ $gen -eq 0 ]
 then
-	qsub -v WorkingDir=$WorkingDir -v RunName=$RunName AraSimBiconeActual_Prototype.sh 
+	qsub -v WorkingDir=$WorkingDir,RunName=$RunName AraSimBiconeActual_Prototype.sh 
 
 fi
 #Any place we see the directory AraSimFlags we need to change that so that AraSimFlags is a directory under the runname directory

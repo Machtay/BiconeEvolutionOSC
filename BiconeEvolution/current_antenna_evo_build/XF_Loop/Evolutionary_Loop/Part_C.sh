@@ -18,7 +18,7 @@ cd Antenna_Performance_Metric
 ## Run AraSim -- feeds the plots into AraSim 
 ## First we convert the plots from XF into AraSim readable files, then we move them to AraSim directory and execute AraSim
 
-
+chmod -R 777 $WorkingDir/Antenna_Performance_Metric
 python XFintoARA.py $NPOP 
 
 #chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/

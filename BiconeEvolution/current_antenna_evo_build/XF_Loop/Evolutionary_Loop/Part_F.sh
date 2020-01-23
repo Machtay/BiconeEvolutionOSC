@@ -17,7 +17,7 @@ RunName=$3
 
 cd Antenna_Performance_Metric
 # Format is source directory (where is generationDNA.csv), destination directory (where to put plots), npop
-python FScorePlot.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $NPOP
+python FScorePlot.py $WorkingDir/Run_Outputs/$RunName $WorkingDir/Run_Outputs/$RunName $NPOP
 
 #
 
