@@ -9,6 +9,8 @@
 #variables
 NPOP=$1
 WorkingDir=$2
+RunName=$3
+gen=$4
 
 #chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
 
@@ -19,6 +21,6 @@ cd Antenna_Performance_Metric
 ## First we convert the plots from XF into AraSim readable files, then we move them to AraSim directory and execute AraSim
 
 chmod -R 777 $WorkingDir/Antenna_Performance_Metric
-python XFintoARA.py $NPOP 
+python XFintoARA.py $NPOP $WorkingDir $RunName $gen
 
 #chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/

@@ -1,4 +1,5 @@
-#!/bin/bash
+!/bin/bash
+#This is a functionized version of the loop using savestates that also has seeded versions of AraSim
 #Evolutionary loop for antennas.
 #Last update: January 15, 2020 by Cade Sbrocco
 #OSU GENETIS Team
@@ -25,6 +26,7 @@
 RunName='Rolla_1_22_20'           ## Replace when needed
 TotalGens=10   			## number of generations (after initial) to run through
 NPOP=10				## number of individuals per generation; please keep this value below 99
+Seeds=1                         ## This is how many versions of AraSim will run for each individual
 FREQ=60 			## frequencies being iterated over in XF (Currectly only affects the output.xmacro loop)
 NNT=100000                        ##Number of Neutrinos Thrown in AraSim   
 exp=18				#exponent of the energy for the neutrinos in AraSim
@@ -169,7 +171,7 @@ do
 	if [ $state -eq 3 ]
 	then
 	        #$indiv=1
-	        ./Part_C.sh $NPOP $WorkingDir $RunName $gen
+	        ./Part_C.sh $NPOP $WorkingDir
 		state=4
 
 		./SaveState_Prototype.sh $gen $state $RunName $indiv
@@ -186,14 +188,14 @@ do
 		state=5
 
 		./SaveState_Prototype.sh $gen $state $RunName $indiv
-		./Part_D1.sh $gen $NPOP $WorkingDir $AraSimExec $exp $NNT $RunName
+		./Part_D1_AraSeed.sh $gen $NPOP $WorkingDir $AraSimExec $exp $NNT $RunName $Seeds
 
 	fi
 
 	## Part D2 ##
 	if [ $state -eq 5 ]
 	then
-	        ./Part_D2.sh $gen $NPOP $WorkingDir $RunName
+	        ./Part_D2_AraSeed.sh $gen $NPOP $WorkingDir $RunName $Seeds
 		state=6
 		./SaveState_Prototype.sh $gen $state $RunName $indiv
 		#./Part_D2.sh $gen $NPOP $WorkingDir $RunName
