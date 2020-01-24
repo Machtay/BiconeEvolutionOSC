@@ -47,7 +47,7 @@ cd "$WorkingDir"/Antenna_Performance_Metric
 for i in `seq 1 $NPOP`
 do
     for j in `seq 1 $Seeds`
-    cp AraOut_${i}_${j}.txt /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Run_Outputs/$RunName/AraOut_${gen}_${i}_${j}.txt
+    	cp AraOut_${i}_${j}.txt /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Run_Outputs/$RunName/AraOut_${gen}_${i}_${j}.txt
 
 done
 
@@ -56,8 +56,7 @@ then
 	cp /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Antenna_Performance_Metric/AraOut_ActualBicone.txt /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Run_Outputs/$RunName/AraOut_ActualBicone.txt
 fi
 
-#Plotting software for Veff(for each individual) vs Generation
-python Veff_Plotting.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $gen $NPOP
+
 
 #chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
 

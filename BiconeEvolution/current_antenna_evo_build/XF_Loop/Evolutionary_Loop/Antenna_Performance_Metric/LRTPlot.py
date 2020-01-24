@@ -117,7 +117,7 @@ for ind in range(g.NPOP):
 
 # Labels:
 axL.set(xlabel='Generation', ylabel = 'Length [cm]')
-axR.set(xlabel='Generation', ylabel = 'Length [cm]')
+axR.set(xlabel='Generation', ylabel = 'Radius [cm]')
 axT.set(xlabel='Generation', ylabel = 'Theta [Radians]')
 
 axL.set_title("Length over Generations (0 - {})".format(int(g.numGens-1)))

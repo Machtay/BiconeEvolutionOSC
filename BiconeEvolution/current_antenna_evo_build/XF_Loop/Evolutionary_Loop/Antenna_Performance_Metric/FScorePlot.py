@@ -44,7 +44,7 @@ filenameActual = "/AraOut_ActualBicone.txt"
 fpActual = open(g.source + filenameActual)
 for line in fpActual:
     if "test Veff(ice) : " in line:
-        Veff_ARA = float(line.split()[3])
+        Veff_ARA = float(line.split()[5]) #changed from 3 to 5 for switching to km^3 from m^3
         #print(Veff_ARA)
     elif "And Veff(water eq.) error plus :" in line:
         Err_plus_ARA = float(line.split()[6])
@@ -54,7 +54,7 @@ for line in fpActual:
 Veff_ARA_Ref = Veff_ARA/(10**9) * np.ones(len(genAxis))
 
 plt.figure()
-plt.plot(genAxis, Veff_ARA_Ref, label = "ARA Reference", linestyle= '--', color = 'k')
+plt.plot(genAxis, Veff_ARA_Ref, label = "ARA Reference", 'o', color = 'k')
 for ind in range(NPOP):
     LabelName = "Individual {}".format(ind+1)
     #multiply fScoresInd by 10^9 because it is in km^3 instead of m

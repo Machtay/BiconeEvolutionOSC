@@ -152,7 +152,7 @@ void Read(char* filename, ifstream& inputFile, string* araLineArray, vector<doub
 	      
 	      commaToken=currentLine.find(",");
 	      spaceToken=currentLine.find(" ",commaToken+2);
-	      double thisvEff = currentLine.substr(commaToken + 2, (spaceToken-commaToken-1));
+	      double thisvEff = stod(currentLine.substr(commaToken + 2, (spaceToken-commaToken-1)));
 	      cout << thisvEff << endl;
 	      sumvEff+=thisvEff;
 
@@ -161,12 +161,12 @@ void Read(char* filename, ifstream& inputFile, string* araLineArray, vector<doub
 	      
 	    } // if the file is there
 	} // end loop over seeds
-	vEff=sumvEff/(double)NSEEDS;
+        double vEff=sumvEff/(double)NSEEDS;
 	
 	if(antennaOuterRadii[individualCounter-1] >= 12.7){
-	  fitnessScores[individualCounter-1] = stod(vEff)*exp(-pow(scaleFactor*(antennaOuterRadii[individualCounter-1]-12.7)/12.7,2));
+	  fitnessScores[individualCounter-1] = (vEff)*exp(-pow(scaleFactor*(antennaOuterRadii[individualCounter-1]-12.7)/12.7,2));
 	}else{
-	  fitnessScores[individualCounter-1] = stod(vEff);
+	  fitnessScores[individualCounter-1] = (vEff);
 	}
 
 

@@ -39,7 +39,7 @@ for ind in range(1,g.NPOP+1):
         #print(line)
         for line in fp:
             if "test Veff(ice) : " in line:
-                Veff = float(line.split()[3]) #to me this looks like it's in units of m^3
+                Veff = float(line.split()[5]) #changed from 3 to use units of km^3sr instead of m^3sr
             elif "And Veff(water eq.) error plus :" in line:
                 Err_plus = float(line.split()[6])
                 Err_minus = float(line.split()[11])
@@ -61,7 +61,7 @@ fpActual = open(g.source + "/" + filenameActual)
 for line in fpActual:
  #   print(line)
     if "test Veff(ice) : " in line:
-        Veff_ARA = float(line.split()[3])
+        Veff_ARA = float(line.split()[5]) #changed from 3 to use units of km^3sr instead of m^3sr
     elif "And Veff(water eq.) error plus :" in line:
         Err_plus_ARA = float(line.split()[6])
         Err_minus_ARA = float(line.split()[11])
@@ -73,7 +73,7 @@ genAxis = np.linspace(0,g.numGens,g.numGens+1)
 #print(Veff_ARA)
 
 Veff_ARA_Ref = Veff_ARA * np.ones(len(genAxis))
-plt.plot(genAxis, Veff_ARA_Ref, label = "ARA Reference", linestyle= '--', color = 'k')
+plt.plot(genAxis, Veff_ARA_Ref, label = "ARA Reference", 'o', color = 'k')
 
 #changed from for ind in range(g.NPOP) to for ind in range(0, g.NPOP) (actually undid this)
 for ind in range(g.NPOP):
@@ -82,7 +82,7 @@ for ind in range(g.NPOP):
   
 plt.xlabel('Generation')
 #plt.ylabel('Length [cm]')
-plt.ylabel('Fitness Score (Ice Volume) (m^3)')
+plt.ylabel('Fitness Score (Ice Volume) (km^3sr)')
 plt.title("Veff over Generations (0 - {})".format(int(g.numGens)))
 plt.legend()
 plt.savefig(g.destination + "/" + "Veff_plot.png")

@@ -20,7 +20,7 @@ exp=$5
 NNT=$6
 RunName=$7
 Seeds=$8
-
+SpecificSeed=32000
 #chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
 
 cd Antenna_Performance_Metric
@@ -49,11 +49,14 @@ do
 ##############################################################################################################################################################################     
         for j in seq `seq 1 $Seeds`
 	do
-        sed -e "s/num_nnu/$NNT/" -e "s/n_exp/$exp/" /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup_dummy.txt > /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup.txt
+	SpecificSeed=$(expr $j + 32000)
+
+        sed -e "s/num_nnu/$NNT/" -e "s/n_exp/$exp/" -e "s/current_seed/$SpecificSeed/" /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup_dummy_araseed.txt > /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup.txt
+	
 	#We will want to call a job here to do what this AraSim call is doing so it can run in parallel
 	cd $WorkingDir
 	#qsub -v num=$i AraSimCall.sh
-	qsub -v num=$i,WorkingDir=$WorkingDir,RunName=$RunName,Seeds=j AraSimCall_AraSeed.sh
+	qsub -v num=$i,WorkingDir=$WorkingDir,RunName=$RunName,Seeds=$j AraSimCall_AraSeed.sh
 
 	rm outputs/*.root
 	done

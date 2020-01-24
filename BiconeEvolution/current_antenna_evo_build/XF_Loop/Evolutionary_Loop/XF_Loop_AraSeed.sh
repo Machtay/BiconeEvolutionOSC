@@ -23,14 +23,14 @@
 
 ####### LINES TO CHECK OVER WHEN STARTING A NEW RUN ###############################################################################################
 
-RunName='Rolla_1_22_20'           ## Replace when needed
-TotalGens=10   			## number of generations (after initial) to run through
-NPOP=10				## number of individuals per generation; please keep this value below 99
-Seeds=1                         ## This is how many versions of AraSim will run for each individual
+RunName='Patton_1_24_20'           ## Replace when needed
+TotalGens=2  			## number of generations (after initial) to run through
+NPOP=1			## number of individuals per generation; please keep this value below 99
+Seeds=2                         ## This is how many versions of AraSim will run for each individual
 FREQ=60 			## frequencies being iterated over in XF (Currectly only affects the output.xmacro loop)
-NNT=100000                        ##Number of Neutrinos Thrown in AraSim   
+NNT=100                        ##Number of Neutrinos Thrown in AraSim   
 exp=18				#exponent of the energy for the neutrinos in AraSim
-ScaleFactor=1.0                   ##ScaleFactor used when punishing fitness scores of antennae larger than holes used in fitnessFunctoin_ARA.cpp
+ScaleFactor=1.0                   ##ScaleFactor used when punishing fitness scores of antennae larger than holes used in fitnessFunction_ARA.cpp
 #####################################################################################################################################################
 
 ########  Initialization of variables  ###############################################################################################################

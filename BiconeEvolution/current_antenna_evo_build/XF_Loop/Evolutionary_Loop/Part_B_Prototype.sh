@@ -112,7 +112,7 @@ for freq in `seq 1 60`
     do
     #Remove if plotting software doesnt need
     #cp data/$i.uan ${i}uan.csv
-	mv Antenna_Performance_Metric/${m}_${freq}.uan "$WorkingDir"/Run_Outputs/$RunName/${gen}_${i}_${freq}.uan
+	mv ${m}_${freq}.uan "$WorkingDir"/Run_Outputs/$RunName/${gen}_${m}_${freq}.uan
     done
 
 #chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
