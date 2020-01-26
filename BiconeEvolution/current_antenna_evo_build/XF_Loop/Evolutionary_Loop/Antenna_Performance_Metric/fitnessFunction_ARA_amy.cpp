@@ -38,7 +38,7 @@ int main(int argc, char** argv)
 	/* Define NPOP first. Due to argv[1] being length NPOP+2, we just hope the user correctly inputs NPOP first, then the list of file names */
 	int NPOP = atoi(argv[1]); // The atoi function converts from string to int
 	int NSEEDS = atoi(argv[2]); 
-	double scaleFactor = stod(argv[3]);
+	double scaleFactor = stod(argv[3]); // scaling variable for the exponent in the constraint. Geometric constraint is defined below in the read function 
 	char* antennaFile = argv[4];
 	//Don't worry about the fact that the loop passes 4 arguments and this declares 3!
 	//We call it later in the read function using argv[indivial+4] to read the input file
@@ -124,7 +124,7 @@ int main(int argc, char** argv)
 void Read(char* filename, ifstream& inputFile, string* araLineArray, vector<double> &fitnessScores, int individualCounter, double scaleFactor, double* antennaOuterRadii, int NSEEDS, vector<double> &vEffList, vector<double> &lowErrorBars, vector<double> &highErrorBars)
 {
 	string txt = filename;
-
+	double GeoScaleFactor = 10; // Scales the geometric constraint 
 	double sumvEff=0.;
 	double sumSquareLowError=0.;
 	double sumSquareHighError=0.;
@@ -191,8 +191,8 @@ void Read(char* filename, ifstream& inputFile, string* araLineArray, vector<doub
         double vEff=sumvEff/(double)NSEEDS;
 	cout << vEff << endl;
 	vEffList[individualCounter-1] = vEff;
-	if(antennaOuterRadii[individualCounter-1] >= 12.7){
-	  fitnessScores[individualCounter-1] = (vEff)*exp(-pow(scaleFactor*(antennaOuterRadii[individualCounter-1]-12.7)/12.7,2));
+	if(antennaOuterRadii[individualCounter-1] >= (12.7/GeoScaleFactor)){
+	  fitnessScores[individualCounter-1] = (vEff)*exp(-pow(scaleFactor*(antennaOuterRadii[individualCounter-1]-(12.7/GeoScaleFactor))/(12.7/GeoScaleFactor),2));
 	}else{
 	  fitnessScores[individualCounter-1] = (vEff);
 	}
