@@ -44,12 +44,12 @@ datLoc = uanLoc # currently, we are saving files in the same directory
 
 ### DEFINITIONS ###
 
-# Reads the (indivNum)freqNum.uan file
-def readFile(indivNum, freqNum):
+# Reads the (indiv)freqNum.uan file
+def readFile(indiv, freqNum):
     n = 37
     m = 73
-    #uanName = uanLoc+str(indivNum)+"_"+str(freqNum)+".uan"
-    uanName = g.WorkingDir + "Run_Outputs" + "/" +g.RunName+ "/" + str(g.gen) + "_" + str(g.indivNum)+"_"+str(freqNum)+".uan"
+    #uanName = uanLoc+str(indiv)+"_"+str(freqNum)+".uan"
+    uanName = g.WorkingDir + "/" + "Run_Outputs" + "/" +g.RunName+ "/" + str(g.gen) + "_" + str(g.indiv)+"_"+str(freqNum)+".uan"
     f = open(uanName, "r")
 
 
@@ -84,7 +84,7 @@ parser.add_argument("NPOP", help="How many antennas are being simulated each gen
 parser.add_argument("WorkingDir", help="Evolutionary_Loop directory", type=str)
 parser.add_argument("RunName", help="Run Name directory where everything will be stored", type=str)
 parser.add_argument("gen", help="The generation the loop is on", type=int)
-parser.add_argument("Indiv", help="The individual in the population", type=int)
+parser.add_argument("indiv", help="The individual in the population", type=int)
 g = parser.parse_args()
 # We process each antenna individually, to reduce computer memory stress
 n = 37

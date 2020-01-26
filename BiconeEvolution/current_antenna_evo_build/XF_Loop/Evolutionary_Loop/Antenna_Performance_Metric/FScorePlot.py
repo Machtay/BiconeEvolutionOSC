@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import argparse
+import csv
  
 #---------GLOBAL VARIABLES----------GLOBAL VARIABLES----------GLOBAL VARIABLES----------GLOBAL VARIABLES
 
@@ -9,6 +10,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("source", help="Name of source folder from home directory", type=str)
 parser.add_argument("destination", help="Name of destination folder from home directory (no end dash)", type=str)
+parser.add_argument("NPOP", help="Number of individuals per generation", type=int)
 parser.add_argument("numGens", help="Number of generations the code is running for (no end dash)", type=int)
 g = parser.parse_args()
 
@@ -20,6 +22,7 @@ Plot3DName = "/FScorePlot3D.png"
 fileReadTemp = []
 fScoresGen = []
 fScoresInd = []
+"""
 #We may want to only have g.numGens and not g.numGens+1
 for gen in range(g.numGens+1):
     filename = "/{}_fitnessScores.csv".format(gen)
@@ -32,6 +35,34 @@ for gen in range(g.numGens+1):
     fScoresGen.append(fileReadTemp[2:])
 fScoresInd = np.transpose(fScoresGen)
 NPOP = len(fScoresInd)
+"""
+
+#new way (similar to in VeffPlotting.py)
+
+tempFitnesses = []
+FitnessesArray = []
+for ind in range(1, g.NPOP+1):
+    lineNum = ind + 1 #the line in the csv files that the individual data is in 
+    #we need to loop over all the generations, since the gen is in the file names
+    for gen in range(0, g.numGens+1):
+        #we need to give the changeable filenames we're gonna read
+        fitnesses = "{}_fitnessScores.csv".format(gen)
+        #for each generation, we need to get all the fitnesses
+        with open(g.source + "/" + fitnesses, "r") as fr: #fr for fitnesses read
+            f_read = csv.reader(fr, delimiter=',') #reading fr as a csv
+            for i, row in enumerate(f_read): #loop over the rows 
+                if i == lineNum: #skipping the header
+                    fitness = float(row[0]) #lineNum contains the fitness score
+                    print(fitness)
+        fr.close()
+        #fill the generation individual values into arrays to hold them temporarily
+        tempFitnesses.append(fitness)
+    #The temporary files contain the same individual at different generations
+    #we want to store these now in the arrays containing all the data
+    FitnessesArray.append(tempFitnesses)
+    tempFitnesses = []
+    
+
 
 genAxis = np.linspace(0,g.numGens,g.numGens+1,endpoint=True)
 
@@ -42,6 +73,7 @@ Veff_ARA_Ref = []
 
 filenameActual = "/AraOut_ActualBicone.txt"
 fpActual = open(g.source + filenameActual)
+
 for line in fpActual:
     if "test Veff(ice) : " in line:
         Veff_ARA = float(line.split()[5]) #changed from 3 to 5 for switching to km^3 from m^3
@@ -51,15 +83,16 @@ for line in fpActual:
         Err_minus_ARA = float(line.split()[11])
 #    line = fpActual.readline()
     #print(line)
-Veff_ARA_Ref = Veff_ARA/(10**9) * np.ones(len(genAxis))
+
+Veff_ARA_Ref = Veff_ARA * np.ones(len(genAxis))
 
 plt.figure()
-plt.plot(genAxis, Veff_ARA_Ref, label = "ARA Reference", 'o', color = 'k')
-for ind in range(NPOP):
+plt.plot(genAxis, Veff_ARA_Ref, label = "ARA Reference", linestyle= '--', color = 'k')
+for ind in range(g.NPOP):
     LabelName = "Individual {}".format(ind+1)
     #multiply fScoresInd by 10^9 because it is in km^3 instead of m
    
-    plt.plot(genAxis, fScoresInd[ind], label = LabelName)
+    plt.plot(genAxis, FitnessesArray[ind], label = LabelName, marker = 'o', linestyle='')
 
 plt.xlabel('Generation')
 plt.ylabel('Fitness Score(10^9)')
@@ -77,7 +110,7 @@ plt.show(block=False)
 plt.pause(15)
 
 plt.figure()
-indAxis = np.linspace(1,NPOP,NPOP)
+indAxis = np.linspace(1,g.NPOP,g.NPOP)
 genAxis, indAxis = np.meshgrid(genAxis, indAxis)
 ax = plt.axes(projection='3d')
 #ax.plot_surface(genAxis, indAxis, fScoresInd, rstride=1, cstride=1, cmap='viridis', edgecolor='none')

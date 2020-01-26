@@ -19,6 +19,7 @@ RunName=$4
 ScaleFactor=$5
 AntennaRadii=$6
 indiv=$7
+Seeds=$8
 
 #chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
 
@@ -35,12 +36,18 @@ do
     InputFiles="${InputFiles}AraOut_${i}.txt "
 done
 
-./fitnessFunction_AraSeed.exe $NPOP $ScaleFactor $AntennaRadii/generationDNA.csv $InputFiles #Here's where we add the flags for the generation
+./fitnessFunction_AraSeed.exe $NPOP $Seeds $ScaleFactor $AntennaRadii/generationDNA.csv $InputFiles #Here's where we add the flags for the generation
 cp fitnessScores.csv "$WorkingDir"/Run_Outputs/$RunName/${gen}_fitnessScores.csv
 mv fitnessScores.csv "$WorkingDir"
 
+cp vEffectives.csv "$WorkingDir"/Run_Outputs/$RunName/${gen}_vEffectives.csv
+mv vEffectives.csv "$WorkingDir"
+
+cp errorBars.csv "$WorkingDir"/Run_Outputs/$RunName/${gen}_errorBars.csv
+mv errorBars.csv "$WorkingDir"
+
 #Plotting software for Veff(for each individual) vs Generation
-python Veff_Plotting.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $gen $NPOP
+python Veff_Plotting.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $gen $NPOP $Seeds
 
 cd "$WorkingDir"
 if [ $gen -eq 0 ]

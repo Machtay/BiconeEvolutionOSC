@@ -13,7 +13,7 @@ cd $WorkingDir/Run_Outputs/$RunName/AraSimFlags/
 #cd $WorkingDir/Run_Outputs/AraSimFlags/
 nFiles=0
 
-totPop=$NPOP
+totPop=$( expr $NPOP \* $Seeds )
 if [ $gen -eq 0 ]
 then
 	totPop=$( expr $NPOP \* $Seeds + 1 )
@@ -47,8 +47,9 @@ cd "$WorkingDir"/Antenna_Performance_Metric
 for i in `seq 1 $NPOP`
 do
     for j in `seq 1 $Seeds`
-    	cp AraOut_${i}_${j}.txt /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Run_Outputs/$RunName/AraOut_${gen}_${i}_${j}.txt
-
+    do
+    	cp AraOut_"${i}"_"${j}".txt /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Run_Outputs/$RunName/AraOut_"${gen}"_"${i}"_"${j}".txt
+    done
 done
 
 if [ $gen -eq 0 ]

@@ -27,23 +27,26 @@ const double EPSILON = 0.000001; // Catches errors. If the first individual's fi
 
 /* Here we declare our function headers. */
 
-void Read(char* filename, ifstream& inputFile, string* araLineArray, vector<double> &fitnessScores, int individualCounter, double scaleFactor, double* antennaOuterRadii);
+void Read(char* filename, ifstream& inputFile, string* araLineArray, vector<double> &fitnessScores, int individualCounter, double scaleFactor, double* antennaOuterRadii, int NSEEDS, vector<double> &vEffList, vector<double> &lowErrorBars, vector<double> &highErrorBars);
 
-void WriteFitnessScores(vector<double> fitnessScores);
+void WriteFitnessScores(vector<double> fitnessScores, vector<double> vEffList, vector<double> lowErrorBars, vector<double> highErrorBars, int NPOP);
 
 /** MAIN FUNCTION **/
 
 int main(int argc, char** argv)
 {
 	/* Define NPOP first. Due to argv[1] being length NPOP+2, we just hope the user correctly inputs NPOP first, then the list of file names */
-	NPOP = atoi(argv[1]); // The atoi function converts from string to int
-	NSEEDS = atoi(argv[2]); 
+	int NPOP = atoi(argv[1]); // The atoi function converts from string to int
+	int NSEEDS = atoi(argv[2]); 
 	double scaleFactor = stod(argv[3]);
 	char* antennaFile = argv[4];
 	//Don't worry about the fact that the loop passes 4 arguments and this declares 3!
 	//We call it later in the read function using argv[indivial+4] to read the input file
 	// Quick variable declarations:
 	vector<double> fitnessScores (NPOP, 0.0); // Stores our fitness scores for each individual.
+	vector<double> vEffList (NPOP, 0.0); // Stores our vEff for each individual
+	vector<double> lowErrorBars (NPOP, 0.0); // Stores our low error bar for each individual
+	vector<double> highErrorBars (NPOP, 0.0); // Stores out high error bar for each individual
 	string *araLineArray = NULL; // Stores the actual lines read in from the .txt files.
 	ifstream inputFile; // Opens the .txt files.
 	double* antennaRadii = new double[NPOP];
@@ -83,6 +86,7 @@ int main(int argc, char** argv)
 
 		  while (getline(lineStream, item, ',')) { 
 		    row.push_back(item);
+		    
 		  }
 		  cout << "R: " << row[0] << " L: " << row[1] << " Theta: " << row[2] << endl;
 		  
@@ -93,18 +97,19 @@ int main(int argc, char** argv)
 		  cout << "Calculated Outer Radii: " << antennaOuterRadii[i] << endl;
 
 		}
-
+		
 			for(int individualCounter = 1; individualCounter <= NPOP; individualCounter++)
 			{
 				araLineArray = new string[NLINES];
 				/* Note the +1 on argv below. This along with the counter starting at 1 starts argv at 2, the third element of argv. Again, the first element is fitnessFunction.exe and the second elemenet is NPOP.*/
-				Read(argv[individualCounter+4], inputFile, araLineArray, fitnessScores, individualCounter, scaleFactor, antennaOuterRadii);
+				cout << "Entering Read" << endl;
+				Read(argv[individualCounter+4], inputFile, araLineArray, fitnessScores, individualCounter, scaleFactor, antennaOuterRadii, NSEEDS, vEffList, lowErrorBars, highErrorBars);
 				cout << "Data successfully read. Data successfully written." << endl;
 				delete [] araLineArray;
 				araLineArray = NULL;
 			}
 			
-	WriteFitnessScores(fitnessScores);
+			WriteFitnessScores(fitnessScores, vEffList, lowErrorBars, highErrorBars, NPOP);
 	cout << "Fitness scores successfully written." << endl << "Fitness function concluded." << endl;
 	}
 	delete[] antennaRadii;
@@ -116,15 +121,16 @@ int main(int argc, char** argv)
 
 // Subroutines:
 
-void Read(char* filename, ifstream& inputFile, string* araLineArray, vector<double> &fitnessScores, int individualCounter, double scaleFactor, double* antennaOuterRadii)
+void Read(char* filename, ifstream& inputFile, string* araLineArray, vector<double> &fitnessScores, int individualCounter, double scaleFactor, double* antennaOuterRadii, int NSEEDS, vector<double> &vEffList, vector<double> &lowErrorBars, vector<double> &highErrorBars)
 {
 	string txt = filename;
 
 	double sumvEff=0.;
-
-
+	double sumSquareLowError=0.;
+	double sumSquareHighError=0.;
+	
 	for (int iseed=1;iseed<=NSEEDS;iseed++) {
-
+	  
 	  string thistxt = txt.substr(0,txt.length()-4);
 
 	  thistxt = thistxt + "_" + to_string(iseed) + ".txt"; // should be of the form AraOut_$gen_$individual_$seed.txt
@@ -143,7 +149,8 @@ void Read(char* filename, ifstream& inputFile, string* araLineArray, vector<doub
 	      string currentLine="Empty"; // Stores the current line we're reading
 	      int commaToken=0; // Stores the comma separating m^3 and km^3
 	      int spaceToken=0; // Stores the space separating km^3 from units
-	      string vEff="0"; // Stores the string form of the effective volume
+	      int colonToken=0;
+	      //double vEff = 0 Stores the string form of the effective volume
 	      int lineNumber = 0;
 	      getline(inputFile,currentLine);
 	      while (currentLine.length() < 15 ||currentLine.substr(0, 13).compare("test Veff(ice")){
@@ -151,38 +158,89 @@ void Read(char* filename, ifstream& inputFile, string* araLineArray, vector<doub
 	      }
 	      
 	      commaToken=currentLine.find(",");
+	      
 	      spaceToken=currentLine.find(" ",commaToken+2);
-	      double thisvEff = stod(currentLine.substr(commaToken + 2, (spaceToken-commaToken-1)));
+	      string thisvEff = currentLine.substr(commaToken + 2, (currentLine.substr(commaToken+2).find(" ")));
 	      cout << thisvEff << endl;
-	      sumvEff+=thisvEff;
+	      sumvEff+=stod(thisvEff);
+	      
+	      
+	      // while (currentLine.length() < 15 ||currentLine.substr(0, 17).compare("And Veff(water eq.")){
+	      //cout << currentLine.substr(0,19) << endl;
+		getline(inputFile,currentLine);
+		getline(inputFile,currentLine);
+		//	cout << "Stuck in new while loop" << endl;
+		//  }
 
+	      colonToken = currentLine.find(":");
+	      spaceToken = currentLine.find(" ",colonToken+2);
+	      string lowErrorBar = currentLine.substr(colonToken+2, spaceToken);
+	      sumSquareLowError += (stod(lowErrorBar)*stod(lowErrorBar)); 
+	      
+	      colonToken = currentLine.find(":", colonToken+2);
+	      spaceToken = currentLine.find(" ",colonToken+2);
+	      string highErrorBar = currentLine.substr(colonToken+2, spaceToken);
+	      sumSquareHighError += (stod(highErrorBar)*stod(highErrorBar)); 
+	      
+      
 	      inputFile.close();
 	      inputFile.clear();
 	      
 	    } // if the file is there
 	} // end loop over seeds
         double vEff=sumvEff/(double)NSEEDS;
-	
+	cout << vEff << endl;
+	vEffList[individualCounter-1] = vEff;
 	if(antennaOuterRadii[individualCounter-1] >= 12.7){
 	  fitnessScores[individualCounter-1] = (vEff)*exp(-pow(scaleFactor*(antennaOuterRadii[individualCounter-1]-12.7)/12.7,2));
 	}else{
 	  fitnessScores[individualCounter-1] = (vEff);
 	}
 
+	double lowErrorBar = sqrt(sumSquareLowError)/(double)NSEEDS;
+	double highErrorBar = sqrt(sumSquareHighError)/(double)NSEEDS;
 
+	lowErrorBars[individualCounter-1]=lowErrorBar;
+	highErrorBars[individualCounter-1]=highErrorBar;
 
 }
 
-void WriteFitnessScores(vector<double> fitnessScores)
+void WriteFitnessScores(vector<double> fitnessScores, vector<double> vEffList, vector<double> lowErrorBars, vector<double> highErrorBars, int NPOP)
 {
 	ofstream fitnessFile;
 	fitnessFile.open("fitnessScores.csv");
 	fitnessFile << "The Ohio State University GENETIS Data." << endl;
 	fitnessFile << "Current generation's fitness scores:" << endl;
+	cout << fitnessScores[0] << endl;
 	
 	for(int i=0; i<NPOP; i++)
 	{
 		fitnessFile << fitnessScores[i] << endl;
 	}
 	fitnessFile.close();
+
+	ofstream vEffFile;
+	vEffFile.open("vEffectives.csv");
+	vEffFile << "The Ohio State University GENETIS Data." << endl;
+	vEffFile << "Current generation's vEff scores:" << endl;
+	
+	
+	for(int i=0; i<NPOP; i++)
+	{
+		vEffFile << vEffList[i] << endl;
+	}
+	vEffFile.close();
+
+
+	ofstream errorFile;
+	errorFile.open("errorBars.csv");
+	errorFile << "The Ohio State University GENETIS Data." << endl;
+	errorFile << "Current generation's errorBar scores:" << endl;
+	
+	
+	for(int i=0; i<NPOP; i++)
+	{
+	  errorFile << lowErrorBars[i] << "," << highErrorBars[i] << endl;
+	}
+	errorFile.close();
 }

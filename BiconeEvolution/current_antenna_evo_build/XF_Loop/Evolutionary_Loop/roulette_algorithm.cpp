@@ -164,15 +164,15 @@ const float CONVERGENCE = 0.00; // Our convergence threshold. If the standard de
 
 // Gene One, Gene One controls radius currently
 
-const float INITIAL_MEAN_C1_G1 = 1.0f;//2.0f; // When we initially run, this is the average value seeded for the gene.
+const float INITIAL_MEAN_C1_G1 = 1.5f;//2.0f; // When we initially run, this is the average value seeded for the gene.
 
 const float INITIAL_STD_DVN_C1_G1 = 0.25f; //1.0; // When starting a new generation, this is the starting variance for the gene.
 
 // Gene Two, Gene two controls length currently 
 
-const float INITIAL_MEAN_C1_G2 = 7.0f;//50.0f; // When we initially run, this is the average value seeded for the gene.
+const float INITIAL_MEAN_C1_G2 = 5.0f;//50.0f; // When we initially run, this is the average value seeded for the gene.
 
-const float INITIAL_STD_DVN_C1_G2 = 1.0f;//15.0f; // When starting a new generation, this is the starting variance for the gene.
+const float INITIAL_STD_DVN_C1_G2 = 1.5f;//15.0f; // When starting a new generation, this is the starting variance for the gene.
 
 // Gene Three, Gene three controls angle (in radians) currently 
 

@@ -10,14 +10,14 @@
 NPOP=$1
 WorkingDir=$2
 RunName=$3
-
+gen=$4
 #chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
 
 # Current Plotting Software
 
 cd Antenna_Performance_Metric
 # Format is source directory (where is generationDNA.csv), destination directory (where to put plots), npop
-python FScorePlot.py $WorkingDir/Run_Outputs/$RunName $WorkingDir/Run_Outputs/$RunName $NPOP
+python FScorePlot.py $WorkingDir/Run_Outputs/$RunName $WorkingDir/Run_Outputs/$RunName $NPOP $gen
 
 #
 

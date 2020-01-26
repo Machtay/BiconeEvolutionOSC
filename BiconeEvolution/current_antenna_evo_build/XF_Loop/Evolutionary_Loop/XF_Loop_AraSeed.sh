@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 #This is a functionized version of the loop using savestates that also has seeded versions of AraSim
 #Evolutionary loop for antennas.
 #Last update: January 15, 2020 by Cade Sbrocco
@@ -18,17 +18,17 @@
 ################################################################################################################################################
 
 
-
-
+#make sure we're using python3
+module load python/3.6-conda5.2
 
 ####### LINES TO CHECK OVER WHEN STARTING A NEW RUN ###############################################################################################
 
-RunName='Patton_1_24_20'           ## Replace when needed
-TotalGens=2  			## number of generations (after initial) to run through
-NPOP=1			## number of individuals per generation; please keep this value below 99
-Seeds=2                         ## This is how many versions of AraSim will run for each individual
+RunName='Machtay_1_26_20_1'           ## Replace when needed
+TotalGens=10  			## number of generations (after initial) to run through
+NPOP=10			## number of individuals per generation; please keep this value below 99
+Seeds=10                         ## This is how many versions of AraSim will run for each individual
 FREQ=60 			## frequencies being iterated over in XF (Currectly only affects the output.xmacro loop)
-NNT=100                        ##Number of Neutrinos Thrown in AraSim   
+NNT=100000                        ##Number of Neutrinos Thrown in AraSim   
 exp=18				#exponent of the energy for the neutrinos in AraSim
 ScaleFactor=1.0                   ##ScaleFactor used when punishing fitness scores of antennae larger than holes used in fitnessFunction_ARA.cpp
 #####################################################################################################################################################
@@ -100,6 +100,7 @@ while read p; do
 done <saveStates/$saveStateFile
 ## THE LOOP ##
 echo "${state}"
+state=`echo ${state} | bc`
 #InitialGen=${gen}
 
 for gen in `seq $InitialGen $TotalGens`
@@ -141,7 +142,7 @@ do
 		for i in `seq $indiv $NPOP`
 		do
 
-	        	./Part_B_Prototype.sh $gen $NPOP $WorkingDir $RunName $XmacrosDir $XFProj $i
+	        	./Part_B_Prototype_GPU.sh $gen $NPOP $WorkingDir $RunName $XmacrosDir $XFProj $i
 			if [ $i -ne $NPOP ]
 			then
 				state=2
@@ -171,7 +172,7 @@ do
 	if [ $state -eq 3 ]
 	then
 	        #$indiv=1
-	        ./Part_C.sh $NPOP $WorkingDir
+	        ./Part_C.sh $NPOP $WorkingDir $RunName $gen $indiv
 		state=4
 
 		./SaveState_Prototype.sh $gen $state $RunName $indiv
@@ -206,7 +207,7 @@ do
 	## Part E ##
 	if [ $state -eq 6 ]
 	then
-	        ./Part_E.sh $gen $NPOP $WorkingDir $RunName $ScaleFactor $AntennaRadii $indiv
+	        ./Part_E_AraSeed.sh $gen $NPOP $WorkingDir $RunName $ScaleFactor $AntennaRadii $indiv $Seeds
 		state=7
 		./SaveState_Prototype.sh $gen $state $RunName $indiv
 		#./Part_E.sh $gen $NPOP $WorkingDir $RunName $ScaleFactor $AntennaRadii
@@ -216,7 +217,7 @@ do
 	## Part F ##
 	if [ $state -eq 7 ]
 	then
-	        ./Part_F.sh $NPOP $WorkingDir $RunName
+	        ./Part_F.sh $NPOP $WorkingDir $RunName $gen
 		state=1
 		./SaveState_Prototype.sh $gen $state $RunName $indiv
 
@@ -224,10 +225,6 @@ do
 
 
 	fi
-
-
-
-
 done
 
 cp generationDNA.csv "$WorkingDir"/Run_Outputs/$RunName/FinalGenerationParameters.csv

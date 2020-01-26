@@ -49,13 +49,13 @@ for i in range(len(runDataRaw)):
 	# We want to skip the empty line and the 'Generation :' line
 	if i%(g.NPOP+2) != 0 and i%(g.NPOP+2) != 1:
 		# The split function takes '1.122650,19.905200,0.504576,32.500000' -> ['1.122650', '19.905200', '0.504576', '32.500000'] , which makes the new list 2D
-		runDataRawOnlyNumb.append(runDataRaw[i].split(',')) 
+		runDataRawOnlyNumb.append(runDataRaw[i].split(','))#.astype(float) 
 #print(runDataRawOnlyNumb)
 # Now convert it to a numpy array and roll it up
 runData = []
 runData = np.array(runDataRawOnlyNumb).astype(np.float)
-runData = runData.reshape((g.numGens, g.NPOP,4))
-
+runData = runData.reshape((g.numGens, g.NPOP, 4))
+#runData = np.array(runData, np.float).reshape(g.numGens, g.NPOP, 4)
 # Finally, the data is in an almost useable shape: (generation, individual, characteristic)
 
 
@@ -111,9 +111,9 @@ axT = fig.add_subplot(1,3,3)
 # Loop through each individual and plot each array
 for ind in range(g.NPOP):
     LabelName = "Individual {}".format(ind+1)
-    axL.plot(lengthsArray[ind], 'o-', label = LabelName)
-    axR.plot(radiiArray[ind], 'o-', label = LabelName)
-    axT.plot(thetasArray[ind], 'o-', label = LabelName)
+    axL.plot(lengthsArray[ind], marker = 'o', label = LabelName, linestyle = '')
+    axR.plot(radiiArray[ind], marker = 'o', label = LabelName, linestyle = '')
+    axT.plot(thetasArray[ind], marker = 'o', label = LabelName, linestyle = '')
 
 # Labels:
 axL.set(xlabel='Generation', ylabel = 'Length [cm]')

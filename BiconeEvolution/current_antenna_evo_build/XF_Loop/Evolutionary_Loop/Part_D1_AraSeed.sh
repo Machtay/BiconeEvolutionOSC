@@ -47,7 +47,7 @@ do
 ###to be as variable changed at the top of this script instead of manually changing it in setup.txt each time. Command works the following way:                            ###                             
 ###sed "s/oldword/newwordReplacingOldword/" path/to/filewiththisword.txt > path/to/fileWeAreOverwriting.txt                                                                ###                             
 ##############################################################################################################################################################################     
-        for j in seq `seq 1 $Seeds`
+        for j in `seq 1 $Seeds`
 	do
 	SpecificSeed=$(expr $j + 32000)
 

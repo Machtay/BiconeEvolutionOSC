@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt	
 import os			
 import argparse
+import csv
 
 # We need to grab the three arguments from the bash script or user. These arguments in order are [the name of the source folder of the fitness scores], [the name of the destination folder for the plots], and [the number of generations] and the NPOP
 parser = argparse.ArgumentParser()
@@ -9,6 +10,7 @@ parser.add_argument("source", help="Name of source folder from home directory", 
 parser.add_argument("destination", help="Name of destination folder from home directory", type=str)
 parser.add_argument("numGens", help="Number of generations the code is running for", type=int)
 parser.add_argument("NPOP", help="Number of individuals in a population", type=int)
+parser.add_argument("Seeds", help="The seed for AraSim", type=int)
 g = parser.parse_args()
 
 Veff = []
@@ -26,11 +28,13 @@ Veff_ARA = []
 Err_plus_ARA = []
 Err_minus_ARA = []
 Veff_ARA_Ref = []
-#changed for gen in range (g.numGens) to for gen in range(0,g.numGens) (actually undid this) 
+
+"""
+#getting the veffective for the evolved antennas
 for ind in range(1,g.NPOP+1):
 #going to change from for gen in range(g.numgens) to for gen in range(0, g.numgens)
     for gen in range(0, g.numGens+1):
-        filename = "AraOut_{}_{}.txt".format(gen, ind)
+        filename = "AraOut_{}_{}.txt".format(gen, ind,)
 #        print(filename)
  #       print(g.source)
         fp = open(g.source + "/" + filename, "r")
@@ -55,7 +59,48 @@ for ind in range(1,g.NPOP+1):
     tempErr_plus = []
     tempErr_minus = []
 #fp.close()
+"""
+#new way of getting veffs of evolved antennas
 
+#we need to loop over the individuals
+for ind in range(1, g.NPOP+1):
+    lineNum = ind + 1 #the line in the csv files that the individual data is in 
+    #we need to loop over all the generations, since the gen is in the file names
+    for gen in range(0, g.numGens+1):
+        #we need to give the changeable filenames we're gonna read
+        veffs = "{}_vEffectives.csv".format(gen)
+        errors = "{}_errorBars.csv".format(gen)
+        #for each generation, we need to get all the veffs and error bars
+        with open(g.source + "/" + veffs, "r") as vr: #vr for veff read
+            v_read = csv.reader(vr, delimiter=',') #reading vr as a csv
+            for i, row in enumerate(v_read): #loop over the rows 
+                if i == lineNum: #skipping the header
+                    Veff = float(row[0]) #lineNum contains veff
+        vr.close()
+        with open(g.source + "/" + errors, "r") as er: #er for errors read 
+            e_read = csv.reader(er, delimiter=',')
+            for i, row in enumerate(e_read):
+                if i == lineNum:
+                    Err_plus = float(row[0])
+                    Err_minus = float(row[1])
+        er.close()
+        #fill the generation individual values into arrays to hold them temporarily
+        tempVeff.append(Veff)
+        tempErr_plus.append(Err_plus)
+        tempErr_minus.append(Err_minus)
+    #The temporary files contain the same individual at different generations
+    #we want to store these now in the arrays containing all the data
+    VeffArray.append(tempVeff)
+    Err_plusArray.append(tempErr_plus)
+    Err_minusArray.append(tempErr_minus)
+    tempVeff = []
+    tempErr_plus = []
+    tempErr_minus = []
+		
+
+
+
+#Getting veffective for the actual ARA bciones
 filenameActual = "AraOut_ActualBicone.txt"
 fpActual = open(g.source + "/" + filenameActual)
 for line in fpActual:
@@ -73,12 +118,14 @@ genAxis = np.linspace(0,g.numGens,g.numGens+1)
 #print(Veff_ARA)
 
 Veff_ARA_Ref = Veff_ARA * np.ones(len(genAxis))
-plt.plot(genAxis, Veff_ARA_Ref, label = "ARA Reference", 'o', color = 'k')
+plt.plot(genAxis, Veff_ARA_Ref, label = "ARA Reference", linestyle= '--', color = 'k')
 
 #changed from for ind in range(g.NPOP) to for ind in range(0, g.NPOP) (actually undid this)
 for ind in range(g.NPOP):
     LabelName = "Individual {}".format(ind+1)
-    plt.errorbar(genAxis, VeffArray[ind], yerr = [Err_minusArray[ind],Err_plusArray[ind]], label = LabelName)
+    yerr_plus = Err_plusArray[ind]
+    yerr_minus = Err_minusArray[ind]
+    plt.errorbar(genAxis, VeffArray[ind], yerr = [yerr_minus, yerr_plus], label = LabelName, marker = 'o', linestyle = '')
   
 plt.xlabel('Generation')
 #plt.ylabel('Length [cm]')
