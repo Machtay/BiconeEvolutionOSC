@@ -15,9 +15,10 @@ cd /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/
 #RunName=$2
 
 echo /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/ARA_bicone6in_output.txt
-./AraSim setup.txt outputs/ 1 /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/ARA_bicone6in_output.txt > /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Antenna_Performance_Metric/AraOut_ActualBicone.txt
+./AraSim setup.txt 1 outputs/ /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/ARA_bicone6in_output.txt > /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Antenna_Performance_Metric/AraOut_ActualBicone.txt
 
 cd $WorkingDir/Run_Outputs/$RunName/AraSimFlags
 
 #cd /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/AraSimFlags/
 echo ARABicone > ARABicone.txt
+#echo ARABicone_${Seeds} > ARABicone_${num}_${Seeds}.txt

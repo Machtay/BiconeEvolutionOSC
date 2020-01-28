@@ -18,9 +18,10 @@ cd /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/
 #into this one like i and WorkingDir
 #if in the job call we have 
 #qsub -v num=$i
+runNum=$( expr $num \* 10 + $Seeds )
 echo a_$num_$Seeds.txt
 chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/outputs/
-./AraSim setup.txt $num outputs/ a_${num}_${Seeds}.txt > /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Antenna_Performance_Metric/AraOut_${num}_${Seeds}.txt
+./AraSim setup.txt $runNum outputs/ a_${num}.txt > /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Antenna_Performance_Metric/AraOut_${num}_${Seeds}.txt
 
 cd $WorkingDir/Run_Outputs/$RunName/AraSimFlags
 echo ${num}_${Seeds} > ${num}_${Seeds}.txt

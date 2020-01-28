@@ -57,7 +57,12 @@ do
 	cd $WorkingDir
 	#qsub -v num=$i AraSimCall.sh
 	qsub -v num=$i,WorkingDir=$WorkingDir,RunName=$RunName,Seeds=$j AraSimCall_AraSeed.sh
-
+	#We need to actually call the actual bicone in a loop too
+	#if [$gen -eq 0]
+	#then
+		#ARA_Seeds=$j+1
+		#qsub -v num=$i,WorkingDir=$WorkingDir,RunName=$RunName,ARA_Seeds=$ARA_Seeds AraSimBiconeActual_Prototype.sh
+	#fi
 	rm outputs/*.root
 	done
 done
@@ -65,6 +70,7 @@ done
 #This submits the job for the actual ARA bicone. Veff depends on Energy and we need this to run once per run to compare it to. 
 if [ $gen -eq 0 ]
 then
+	#sed -e "s/num_nnu/100000" /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup_dummy_araseed.txt > /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup.txt
 	qsub -v WorkingDir=$WorkingDir,RunName=$RunName AraSimBiconeActual_Prototype.sh 
 
 fi

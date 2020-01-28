@@ -124,7 +124,7 @@ int main(int argc, char** argv)
 void Read(char* filename, ifstream& inputFile, string* araLineArray, vector<double> &fitnessScores, int individualCounter, double scaleFactor, double* antennaOuterRadii, int NSEEDS, vector<double> &vEffList, vector<double> &lowErrorBars, vector<double> &highErrorBars)
 {
 	string txt = filename;
-	double GeoScaleFactor = 10; // Scales the geometric constraint 
+	double GeoScaleFactor = 2; // Scales the geometric constraint 
 	double sumvEff=0.;
 	double sumSquareLowError=0.;
 	double sumSquareHighError=0.;

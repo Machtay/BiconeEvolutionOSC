@@ -50,10 +50,16 @@ for i in range(len(runDataRaw)):
 	if i%(g.NPOP+2) != 0 and i%(g.NPOP+2) != 1:
 		# The split function takes '1.122650,19.905200,0.504576,32.500000' -> ['1.122650', '19.905200', '0.504576', '32.500000'] , which makes the new list 2D
 		runDataRawOnlyNumb.append(runDataRaw[i].split(','))#.astype(float) 
-#print(runDataRawOnlyNumb)
+print("RawOnlyNumb ")
+print(runDataRawOnlyNumb)
 # Now convert it to a numpy array and roll it up
 runData = []
+runData = np.array(runDataRawOnlyNumb)
+print("runData ")
+print(runData)
 runData = np.array(runDataRawOnlyNumb).astype(np.float)
+print("runData ")
+print(runData)
 runData = runData.reshape((g.numGens, g.NPOP, 4))
 #runData = np.array(runData, np.float).reshape(g.numGens, g.NPOP, 4)
 # Finally, the data is in an almost useable shape: (generation, individual, characteristic)

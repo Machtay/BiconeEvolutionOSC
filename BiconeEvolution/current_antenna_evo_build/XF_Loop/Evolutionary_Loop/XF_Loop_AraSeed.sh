@@ -1,4 +1,4 @@
-#!/bin/bash
+a#!/bin/bash
 #This is a functionized version of the loop using savestates that also has seeded versions of AraSim
 #Evolutionary loop for antennas.
 #Last update: January 15, 2020 by Cade Sbrocco
@@ -23,12 +23,12 @@ module load python/3.6-conda5.2
 
 ####### LINES TO CHECK OVER WHEN STARTING A NEW RUN ###############################################################################################
 
-RunName='Machtay_1_26_20_1'           ## Replace when needed
+RunName='Rolla_halfscalefactor'           ## Replace when needed
 TotalGens=10  			## number of generations (after initial) to run through
-NPOP=10			## number of individuals per generation; please keep this value below 99
+NPOP=2			## number of individuals per generation; please keep this value below 99
 Seeds=10                         ## This is how many versions of AraSim will run for each individual
 FREQ=60 			## frequencies being iterated over in XF (Currectly only affects the output.xmacro loop)
-NNT=100000                        ##Number of Neutrinos Thrown in AraSim   
+NNT=10000                        ##Number of Neutrinos Thrown in AraSim   
 exp=18				#exponent of the energy for the neutrinos in AraSim
 ScaleFactor=1.0                   ##ScaleFactor used when punishing fitness scores of antennae larger than holes used in fitnessFunction_ARA.cpp
 #####################################################################################################################################################
@@ -62,26 +62,39 @@ cd ..
 
 ## Read current state of loop ##
 line=1
+InititalGen=0
+state=0
+indiv=0
 while read p; do
 	if [ $line -eq 1 ]
 	then
 		InitialGen=$p
-		echo "${p}"
+		#echo "${p}"
+		#echo "${InitialGen}"
+	       
 
 	fi
 	
 	if [ $line -eq 2 ]
 	then
 		state=$p
-		echo "${p}"
-		line=2
+		#echo "${p}"
+		#echo "${state}"
+	        
 	fi
 	
 	if [ $line -eq 3 ]
 	then
 	        indiv=$p
-		echo "${p}"
+		#echo "${p}"
+		#echo "${indiv}"
+		
+	fi
+	
+	if [ $line -eq 2 ]
+	then
 		line=3
+
 	fi
 
 	if [ $line -eq 1 ]
@@ -90,17 +103,17 @@ while read p; do
 
 	fi
 
-	if [ $line -eq 2 ]
-	then
-		line=3
-
-	fi
-	
+       
 	
 done <saveStates/$saveStateFile
+
+
+
 ## THE LOOP ##
+echo "${InitialGen}"
 echo "${state}"
-state=`echo ${state} | bc`
+echo "${indiv}"
+#state=`echo ${state} | bc`
 #InitialGen=${gen}
 
 for gen in `seq $InitialGen $TotalGens`
