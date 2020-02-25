@@ -1,4 +1,3 @@
-  
 /*	This GA is adapted from CalPoly's hybrid roulette / tournament method to work with Ohio State's loop. 
 	Written by David Liu
 	Revised by Suren Gourapura to accept NPoP on 29 Dec 2018
@@ -7,7 +6,7 @@
 	
 */
 
-// Compile using: g++ -std=c++11 roulette_algorithm.cpp roulette_alg.exe
+// Compile using: g++ -std=c++11 roulette_algorithm.cpp -o roulette_algorithm.exe
 #include <time.h>
 #include <math.h>
 #include <random>
@@ -85,9 +84,9 @@ void tournament(vector<vector<vector<float>>> &varInput, vector<vector<vector<fl
 	to be able to work with an arbitrary number of sections or variables.
 */
 
-//Multiplier constant--used when we need to change bicone sizes for faster simulations
-const double MULTIPLIER_FACTOR = 2;
-// SIMULATION CONSTANTS
+
+// Machtay 2/21/20: I am moving some of the global variables into the main function
+// I'll leave the things I am moving into main commented out here for now in case we need to undo it
 
 const double MINIMUM_FREQUENCY = 0.08333; // This global constant defines the minimum frequency of the range we're working in, in GHz; Initial value is what AraSim uses
 //MINIMUM_FREQUENCY = MINIMUM_FREQUENCY*MULTIPLIER_FACTOR
@@ -97,6 +96,8 @@ const double MAXIMUM_FREQUENCY = 1.0667; // This global constant defines the max
 
 const double FREQ_STEP = 0.01667; // This global constant defines the step size between frequencies as we scan.
 //FREQ_STEP = FREQ_STEP*MULTIPLIER_FACTOR
+
+
 
 //	DNA RELATED CONSTANTS
 
@@ -169,19 +170,19 @@ const float CONVERGENCE = 0.00; // Our convergence threshold. If the standard de
 
 // Gene One, Gene One controls radius currently
 
-const float INITIAL_MEAN_C1_G1 = 1.5f / MULTIPLIER_FACTOR ; //2.0f; // When we initially run, this is the average value seeded for the gene.
+float INITIAL_MEAN_C1_G1 = 1.5f;// / MULTIPLIER_FACTOR ; // When we initially run, this is the average value seeded for the gene.
 //The multiplier factor is commented out above to test if this is causing our problem 1/27/20
 //INITIAL_MEAN_C1_G1 = INITIAL_MEAN_C1_G1 / MULTIPLIER_FACTOR
 
-const float INITIAL_STD_DVN_C1_G1 = 0.25f / MULTIPLIER_FACTOR; //1.0; // When starting a new generation, this is the starting variance for the gene.
+float INITIAL_STD_DVN_C1_G1 = 0.75f; // / MULTIPLIER_FACTOR; //1.0; // When starting a new generation, this is the starting variance for the gene.
 //INITIAL_STD_DVN_C1_G1 = INITIAL_STD_DVN_C1_G1 / MULTIPLIER_FACTOR
 
 // Gene Two, Gene two controls length currently 
 
-const float INITIAL_MEAN_C1_G2 = 50.0f / MULTIPLIER_FACTOR;//50.0f; // When we initially run, this is the average value seeded for the gene.
+float INITIAL_MEAN_C1_G2 = 50.0f; // / MULTIPLIER_FACTOR;//50.0f; // When we initially run, this is the average value seeded for the gene.
 //INITIAL_MEAN_C1_G2 = INITIAL_MEAN_C1_G2 / MULTIPLIER_FACTOR
 
-const float INITIAL_STD_DVN_C1_G2 = 15.0f / MULTIPLIER_FACTOR;//15.0f; // When starting a new generation, this is the starting variance for the gene.
+float INITIAL_STD_DVN_C1_G2 = 15.0f; // / MULTIPLIER_FACTOR;//15.0f; // When starting a new generation, this is the starting variance for the gene.
 //INITIAL_STD_DVN_C1_G2 = INITIAL_STD_DVN_C1_G2 / MULTIPLIER_FACTOR
 
 
@@ -198,8 +199,12 @@ const float INITIAL_STD_DVN_CX_GY = 0.0f;
 
 const float MUT_MODULATOR = 4.0f; // This is inversely proportional to the magnitude of mutations. At 2, all mutations are halved in magnitude. The higher this goes, the slower evolution becomes.
 
+
+//main function
+
 int main(int argc, char const *argv[])
 {
+
     /*
 	argc = number of console commands
 	argv[] = actual console commands 
@@ -243,6 +248,39 @@ int main(int argc, char const *argv[])
 	CHROMOSOME Y	RADIUS Y   LENGTH Y    VAR 3       VAR 4     ...      VAR Z
 	
 	*/
+
+	/*
+
+	We need to adjust the antennas dimensions and frequencies according to our scalefactor, which will be an argument. 
+	We're gonna add this on to the end, so the scalefactor will be the final argument.
+
+	 */
+
+
+	//We need to define the scale facor first	
+	double GEOSCALE_FACTOR = stod(argv[3]);
+
+	//gene 1 (Radius)
+	INITIAL_MEAN_C1_G1 /= GEOSCALE_FACTOR;
+	INITIAL_STD_DVN_C1_G1 /= GEOSCALE_FACTOR;
+
+	//gene 2 (Length)
+	INITIAL_MEAN_C1_G2 /= GEOSCALE_FACTOR;
+	INITIAL_STD_DVN_C1_G2 /= GEOSCALE_FACTOR;
+
+	//gene 3 (Theta)
+	//(gene 3 does not need to change; the angle is the same when we scale down the radius and length by the same factor)
+
+	//The frequencies get scaled inversely with the dimensions
+	MINIMUM_FREQUENCY *= GEOSCALE_FACTOR; 
+
+	MAXIMUM_FREQUENCY *= GEOSCALE_FACTOR; 
+	
+	FREQ_STEP *= GEOSCALE_FACTOR; 
+
+
+
+
 
 	// First, define NPOP using the user's input. The atoi function converts from string to int
 	NPOP = atoi(argv[2]);

@@ -86,17 +86,16 @@ for line in fpActual:
 
 Veff_ARA_Ref = Veff_ARA * np.ones(len(genAxis))
 
-plt.figure()
+plt.figure(figsize=(10, 8))
 plt.plot(genAxis, Veff_ARA_Ref, label = "ARA Reference", linestyle= '--', color = 'k')
 for ind in range(g.NPOP):
     LabelName = "Individual {}".format(ind+1)
-    #multiply fScoresInd by 10^9 because it is in km^3 instead of m
    
-    plt.plot(genAxis, FitnessesArray[ind], label = LabelName, marker = 'o', linestyle='')
+    plt.plot(genAxis, FitnessesArray[ind], label = LabelName, marker = 'o', linestyle='', markersize = 11)
 
-plt.xlabel('Generation')
-plt.ylabel('Fitness Score(10^9)')
-plt.title("Fitness Score over Generations (0 - {})".format(int(g.numGens)))
+plt.xlabel('Generation', size = 22)
+plt.ylabel('Fitness Score', size = 22)
+plt.title("Fitness Score over Generations (0 - {})".format(int(g.numGens)), size = 25)
 plt.legend()
 plt.savefig(g.destination + Plot2DName)
 
@@ -109,7 +108,7 @@ plt.savefig(g.destination + Plot2DName)
 plt.show(block=False)
 plt.pause(15)
 
-plt.figure()
+plt.figure(figsize=(10, 8))
 indAxis = np.linspace(1,g.NPOP,g.NPOP)
 genAxis, indAxis = np.meshgrid(genAxis, indAxis)
 ax = plt.axes(projection='3d')

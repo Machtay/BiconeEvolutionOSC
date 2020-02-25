@@ -5,7 +5,8 @@
 #PBS -o /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/scriptEOFiles/
 #PBS -e /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/scriptEOFiles/
 #cd into the AraSim directory
-cd /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/
+#cd /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/
+cd $AraSimDir
 #this is the command in the XF script although I don't know if we can pass in variables from that script
 #into this one like i and WorkingDir
 #if in the job call we have
@@ -14,8 +15,12 @@ cd /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/
 #WorkingDir=$1
 #RunName=$2
 
-echo /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/ARA_bicone6in_output.txt
-./AraSim setup.txt 1 outputs/ /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/ARA_bicone6in_output.txt > /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Antenna_Performance_Metric/AraOut_ActualBicone.txt
+#echo /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/ARA_bicone6in_output.txt
+echo $AraSimDir/ARA_bicone6in_output.txt
+
+#./AraSim setup.txt 1 outputs/ /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/ARA_bicone6in_output.txt > /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Antenna_Performance_Metric/AraOut_ActualBicone.txt
+
+./AraSim setup.txt 1 outputs/ $AraSimDir/ARA_bicone6in_output.txt > $WorkingDir/Antenna_Performance_Metric/AraOut_ActualBicone.txt
 
 cd $WorkingDir/Run_Outputs/$RunName/AraSimFlags
 

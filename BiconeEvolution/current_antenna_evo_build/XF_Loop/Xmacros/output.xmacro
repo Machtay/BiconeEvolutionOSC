@@ -1,7 +1,7 @@
 var query = new ResultQuery();
 ///////////////////////Get Theta and Phi Gain///////////////
 query.projectId = App.getActiveProject().getProjectDirectory();
-var m = 10;
+var m = 2;
 var NPOP = 10;
 for (var k = 1; k <= NPOP; k++){
 var simNum = "0000"

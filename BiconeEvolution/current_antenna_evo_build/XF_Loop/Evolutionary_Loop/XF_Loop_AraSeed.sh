@@ -1,4 +1,4 @@
-a#!/bin/bash
+#!/bin/bash
 #This is a functionized version of the loop using savestates that also has seeded versions of AraSim
 #Evolutionary loop for antennas.
 #Last update: January 15, 2020 by Cade Sbrocco
@@ -9,9 +9,7 @@ a#!/bin/bash
 ################################################################################################################################################
 #
 #
-# The way this loop is written now is so it does steps A-F for the first generation before looping through the rest of the generations and doing the the same steps for each generation. 
-# One thing that we should think about improving is putting the first generation into the same loop barring any initialization steps that may need to be adjusted.
-#
+# This loop contains 7 different parts. Each part is its own function and is contained in its own bash script (Part_A to Part_F, with there being 2 part_Ds). When the loop is finished running through, it will restart for a set number of generations. 
 # The code is optimised for a dynamic choice of NPOP UP TO fitnessFunction.exe. From there on, it has not been checked.
 #
 #
@@ -23,14 +21,28 @@ module load python/3.6-conda5.2
 
 ####### LINES TO CHECK OVER WHEN STARTING A NEW RUN ###############################################################################################
 
-RunName='Rolla_halfscalefactor'           ## Replace when needed
-TotalGens=10  			## number of generations (after initial) to run through
-NPOP=2			## number of individuals per generation; please keep this value below 99
-Seeds=10                         ## This is how many versions of AraSim will run for each individual
-FREQ=60 			## frequencies being iterated over in XF (Currectly only affects the output.xmacro loop)
-NNT=10000                        ##Number of Neutrinos Thrown in AraSim   
-exp=18				#exponent of the energy for the neutrinos in AraSim
-ScaleFactor=1.0                   ##ScaleFactor used when punishing fitness scores of antennae larger than holes used in fitnessFunction_ARA.cpp
+RunName='NoninteractiveTest1'      ## This is the name of the run. You need to make a unique name each time you run.
+TotalGens=2  			   ## number of generations (after initial) to run through
+NPOP=1 		                   ## number of individuals per generation; please keep this value below 99
+Seeds=1                            ## This is how many AraSim jobs will run for each individual
+FREQ=60 			   ## the number frequencies being iterated over in XF (Currectly only affects the output.xmacro loop)
+NNT=1000                           ## Number of Neutrinos Thrown in AraSim   
+exp=18				   ## exponent of the energy for the neutrinos in AraSim
+ScaleFactor=1.0                    ## ScaleFactor used when punishing fitness scores of antennae larger than the drilling holes
+GeoFactor=2 			   ## This is the number by which we are scaling DOWN our antennas. This is passed to many files
+
+###########################New variables we need to pass ################
+# To do this will involve changing the roulette algorithm somewhat drastically. I'll work on this in the meeting on 2/21/20 --Machtay
+# The below variables are passed to the roulette algorithm to be used as the properties of the gaussians which generate the antennas
+# Antenna Dimensions and their standard deviations (passed to roulette algorithm)
+# Antenna_length = # the mean length of the antennas
+# Antenna_length_std = # the standard deviation of the length of the antennas
+# Antenna_radius = # the mean radius of the antennas
+# Antenna_radius_std = # the standard deviation of the radius of the antennas
+# Antenna_angle = # the opening angle of the bicone
+# Antenna_angle_std = # the standard deviation of the opening angle of the bicone
+# Setting these in the bash script means we need to recompile the roulette algorithm every time we run
+
 #####################################################################################################################################################
 
 ########  Initialization of variables  ###############################################################################################################
@@ -118,12 +130,13 @@ echo "${indiv}"
 
 for gen in `seq $InitialGen $TotalGens`
 do
-	read -p "Starting generation ${gen} at location ${state}. Press any key to continue... " -n1 -s
+	#read -p "Starting generation ${gen} at location ${state}. Press any key to continue... " -n1 -s
 	
 
 	## This only runs if starting new run ##
 	if [[ $gen -eq 0 && $state -eq 0 ]]
 	then
+	        read -p "Starting generation ${gen} at location ${state}. Press any key to continue... " -n1 -s
 		# Make the run name directory
 		mkdir -m777 $WorkingDir/Run_Outputs/$RunName
 		mkdir -m777 $WorkingDir/Run_Outputs/$RunName/AraSimFlags
@@ -137,9 +150,10 @@ do
 
 
 	## Part A ##
+	##Here, we are running the genetic algorithm and moving the outputs to csv files 
 	if [ $state -eq 1 ]
 	then
-	        ./Part_A.sh $gen $NPOP $WorkingDir $RunName
+	        ./Part_A.sh $gen $NPOP $WorkingDir $RunName $GeoFactor
 		state=2
 		./SaveState_Prototype.sh $gen $state $RunName $indiv
 		#./Part_A.sh $gen $NPOP $WorkingDir $RunName
@@ -147,15 +161,14 @@ do
 
 	fi
 
-#########Commenting the below out--we shouldn't be looping this way######################
+
 	## Part B ##
-	#We need to change this so that instead of having the loop inside of Part B we loop over Part B
 	if [ $state -eq 2 ]
 	then
 		for i in `seq $indiv $NPOP`
 		do
 
-	        	./Part_B_Prototype_GPU.sh $gen $NPOP $WorkingDir $RunName $XmacrosDir $XFProj $i
+	        	./Part_B_Prototype_GPU.sh $gen $NPOP $WorkingDir $RunName $XmacrosDir $XFProj $i $GeoFactor
 			if [ $i -ne $NPOP ]
 			then
 				state=2
@@ -167,24 +180,13 @@ do
 			#./Part_B.sh $gen $NPOP $WorkingDir $RunName $XmacrosDir $XFProj
 		done
 	fi
-###############################End commenting out##########################################
+
 	
-
-#####################Substituting this in for the above commented out stuff################
-#	if [ $state -eq 2 ]
-#	then
-#		./Part_B_Prototype.sh $gen $NPOP $WorkingDir $RunName $XmacrosDir $XFProj 1
-#		state=3
-#		./SaveState_Prototype.sh $gen $state $RunName $indiv
-#	fi
-
-
-#######################################End substitution###############################
 
 	## Part C ##
 	if [ $state -eq 3 ]
 	then
-	        #$indiv=1
+	        $indiv=1
 	        ./Part_C.sh $NPOP $WorkingDir $RunName $gen $indiv
 		state=4
 
@@ -218,11 +220,14 @@ do
 	fi
 
 	## Part E ##
+	## Concatenates the AraSim data files into a string so that it's usable for getting scores
+	## Gets important information on the fitness scores and generation DNA
+	## moves the .uan files from Antenna Performance Metric to RunOutputs/$RunName folder
 	if [ $state -eq 6 ]
 	then
 	        ./Part_E_AraSeed.sh $gen $NPOP $WorkingDir $RunName $ScaleFactor $AntennaRadii $indiv $Seeds
 		state=7
-		./SaveState_Prototype.sh $gen $state $RunName $indiv
+		./SaveState_Prototype.sh $gen $state $RunName $indiv $GeoFactor
 		#./Part_E.sh $gen $NPOP $WorkingDir $RunName $ScaleFactor $AntennaRadii
 
 	fi

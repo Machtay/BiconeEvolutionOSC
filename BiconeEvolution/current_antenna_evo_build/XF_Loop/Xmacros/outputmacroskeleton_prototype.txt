@@ -88,7 +88,7 @@ Output.println( "5getCurrentDataSet() : " +
 inputpower.getReasonWhyInvalid() );
 }
 for (var i = 0; i <= 59; i++){
-var file = "/fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Antenna_Performance_Metric/";
+var file = "fileDirectory/Antenna_Performance_Metric/";
 file = file + k + "_";
 file = file + (i+1) + ".uan";
 FarZoneUtils.exportToUANFile(thdata,thphase,phdata,phphase,inputpower,file, i);

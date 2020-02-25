@@ -99,7 +99,6 @@ for ind in range(1, g.NPOP+1):
 		
 
 
-
 #Getting veffective for the actual ARA bciones
 filenameActual = "AraOut_ActualBicone.txt"
 fpActual = open(g.source + "/" + filenameActual)
@@ -113,24 +112,30 @@ for line in fpActual:
 #    line = fpActual.readline()
 fpActual.close()
 
-genAxis = np.linspace(0,g.numGens,g.numGens+1)
+genAxis = np.linspace(0,g.numGens,g.numGens+1, endpoint=True)
+
 #print(genAxis)
 #print(Veff_ARA)
 
 Veff_ARA_Ref = Veff_ARA * np.ones(len(genAxis))
+plt.figure(figsize = (10, 8))
 plt.plot(genAxis, Veff_ARA_Ref, label = "ARA Reference", linestyle= '--', color = 'k')
 
 #changed from for ind in range(g.NPOP) to for ind in range(0, g.NPOP) (actually undid this)
+ax = plt.subplot(111)
 for ind in range(g.NPOP):
-    LabelName = "Individual {}".format(ind+1)
+    LabelName = "{}".format(ind+1)
     yerr_plus = Err_plusArray[ind]
     yerr_minus = Err_minusArray[ind]
-    plt.errorbar(genAxis, VeffArray[ind], yerr = [yerr_minus, yerr_plus], label = LabelName, marker = 'o', linestyle = '')
+    #ax.xlabel('Generation', size = 21)
+    #ax.ylabel('Fitness Score (Ice Volume) ($km^3$sr)', size = 21)
+    ax.title('Generation', size = 21)
+    plt.errorbar(genAxis, VeffArray[ind], yerr = [yerr_minus, yerr_plus], label = LabelName, marker = 'o', linestyle = '', markersize = 18)
   
-plt.xlabel('Generation')
-#plt.ylabel('Length [cm]')
-plt.ylabel('Fitness Score (Ice Volume) (km^3sr)')
-plt.title("Veff over Generations (0 - {})".format(int(g.numGens)))
+plt.xlabel('Generation', size = 21)
+plt.ylabel('Length [cm]')
+plt.ylabel('Fitness Score (Ice Volume) (km^3sr)', size = 21)
+plt.title("Veff over Generations (0 - {})".format(int(g.numGens)), size = 23)
 plt.legend()
 plt.savefig(g.destination + "/" + "Veff_plot.png")
 #plt.show()

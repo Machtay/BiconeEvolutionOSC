@@ -18,17 +18,18 @@ gen=$1
 NPOP=$2
 WorkingDir=$3
 RunName=$4
+GeoFactor=$5
 
 #chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
 
 cd "$WorkingDir"
 if [ $gen -eq 0 ]
 then
-
-	./roulette_algorithm.exe start $NPOP
+	
+	./roulette_algorithm.exe start $NPOP $GeoFactor 
 
 else
-	./roulette_algorithm.exe cont $NPOP
+	./roulette_algorithm.exe cont $NPOP $GeoFactor
 fi
 
 cp generationDNA.csv Run_Outputs/$RunName/${gen}_generationDNA.csv

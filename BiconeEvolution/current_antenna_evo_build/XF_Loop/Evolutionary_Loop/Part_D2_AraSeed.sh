@@ -44,17 +44,18 @@ wait
 
 cd "$WorkingDir"/Antenna_Performance_Metric
 #saving AraSim outputs so they are not overwritten.
-for i in `seq 1 $NPOP`
-do
-    for j in `seq 1 $Seeds`
-    do
-    	cp AraOut_"${i}"_"${j}".txt /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Run_Outputs/$RunName/AraOut_"${gen}"_"${i}"_"${j}".txt
-    done
-done
+#This following was used before TMPDIR was used for AraOut transfer
+#for i in `seq 1 $NPOP`
+#do
+#    for j in `seq 1 $Seeds`
+#    do
+#    	cp AraOut_"${i}"_"${j}".txt $WorkingDir/Run_Outputs/$RunName/AraOut_"${gen}"_"${i}"_"${j}".txt
+#    done
+#done
 
 if [ $gen -eq 0 ]
 then
-	cp /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Antenna_Performance_Metric/AraOut_ActualBicone.txt /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Run_Outputs/$RunName/AraOut_ActualBicone.txt
+	cp $WorkingDir/Antenna_Performance_Metric/AraOut_ActualBicone.txt $WorkingDir/Run_Outputs/$RunName/AraOut_ActualBicone.txt
 fi
 
 

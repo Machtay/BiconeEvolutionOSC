@@ -56,7 +56,7 @@ do
 	#We will want to call a job here to do what this AraSim call is doing so it can run in parallel
 	cd $WorkingDir
 	#qsub -v num=$i AraSimCall.sh
-	qsub -v num=$i,WorkingDir=$WorkingDir,RunName=$RunName,Seeds=$j AraSimCall_AraSeed.sh
+	qsub -v num=$i,WorkingDir=$WorkingDir,RunName=$RunName,Seeds=$j,AraSimDir=$AraSimExec,gen=$gen AraSimCall_AraSeed.sh
 	#We need to actually call the actual bicone in a loop too
 	#if [$gen -eq 0]
 	#then
@@ -71,7 +71,7 @@ done
 if [ $gen -eq 0 ]
 then
 	#sed -e "s/num_nnu/100000" /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup_dummy_araseed.txt > /fs/project/PAS0654/BiconeEvolutionOSC/AraSim/setup.txt
-	qsub -v WorkingDir=$WorkingDir,RunName=$RunName AraSimBiconeActual_Prototype.sh 
+	qsub -v WorkingDir=$WorkingDir,RunName=$RunName,AraSimDir=$AraSimExec AraSimBiconeActual_Prototype.sh 
 
 fi
 #Any place we see the directory AraSimFlags we need to change that so that AraSimFlags is a directory under the runname directory

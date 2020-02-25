@@ -5,6 +5,8 @@
 
 	This program reads data from XF and ouputs fitness scores to a file named fitnessScores.csv.
   	It reads the data from the AraSim output files from the Antenna_Performance_Metric folder, and outputs to file named fitnessScore.csv.
+
+compile with: g++ -std=c++11 fitnessFunction_ARA_amy.cpp -o fitnessFunction_AraSeed.exe
  */
  
 #include <iostream>
@@ -24,10 +26,11 @@ int NSEEDS; /* this is the number of parallel jobs we run, each with a different
 const int HEADER = 729; // Which line is Veff(ice) on from the AraSim output files?
 const int NLINES = 737; // How many lines are there in the AraSim output files?
 const double EPSILON = 0.000001; // Catches errors. If the first individual's fitness score is less than this value, we rerun the program.
+double GeoScaleFactor; // factor by which we are scaling down our antennas
 
 /* Here we declare our function headers. */
 
-void Read(char* filename, ifstream& inputFile, string* araLineArray, vector<double> &fitnessScores, int individualCounter, double scaleFactor, double* antennaOuterRadii, int NSEEDS, vector<double> &vEffList, vector<double> &lowErrorBars, vector<double> &highErrorBars);
+void Read(char* filename, ifstream& inputFile, string* araLineArray, vector<double> &fitnessScores, int individualCounter, double scaleFactor, double* antennaOuterRadii, int NSEEDS, vector<double> &vEffList, vector<double> &lowErrorBars, vector<double> &highErrorBars, double GeoScaleFactor);
 
 void WriteFitnessScores(vector<double> fitnessScores, vector<double> vEffList, vector<double> lowErrorBars, vector<double> highErrorBars, int NPOP);
 
@@ -38,8 +41,9 @@ int main(int argc, char** argv)
 	/* Define NPOP first. Due to argv[1] being length NPOP+2, we just hope the user correctly inputs NPOP first, then the list of file names */
 	int NPOP = atoi(argv[1]); // The atoi function converts from string to int
 	int NSEEDS = atoi(argv[2]); 
-	double scaleFactor = stod(argv[3]); // scaling variable for the exponent in the constraint. Geometric constraint is defined below in the read function 
+	double scaleFactor = stod(argv[3]); // scaling variable for the exponent in the constraint. 
 	char* antennaFile = argv[4];
+	double GeoScaleFactor = stod(argv[5]); // Factor by which we scale down the antenna dimensions
 	//Don't worry about the fact that the loop passes 4 arguments and this declares 3!
 	//We call it later in the read function using argv[indivial+4] to read the input file
 	// Quick variable declarations:
@@ -103,7 +107,7 @@ int main(int argc, char** argv)
 				araLineArray = new string[NLINES];
 				/* Note the +1 on argv below. This along with the counter starting at 1 starts argv at 2, the third element of argv. Again, the first element is fitnessFunction.exe and the second elemenet is NPOP.*/
 				cout << "Entering Read" << endl;
-				Read(argv[individualCounter+4], inputFile, araLineArray, fitnessScores, individualCounter, scaleFactor, antennaOuterRadii, NSEEDS, vEffList, lowErrorBars, highErrorBars);
+				Read(argv[individualCounter+4], inputFile, araLineArray, fitnessScores, individualCounter, scaleFactor, antennaOuterRadii, NSEEDS, vEffList, lowErrorBars, highErrorBars, GeoScaleFactor);
 				cout << "Data successfully read. Data successfully written." << endl;
 				delete [] araLineArray;
 				araLineArray = NULL;
@@ -121,10 +125,13 @@ int main(int argc, char** argv)
 
 // Subroutines:
 
-void Read(char* filename, ifstream& inputFile, string* araLineArray, vector<double> &fitnessScores, int individualCounter, double scaleFactor, double* antennaOuterRadii, int NSEEDS, vector<double> &vEffList, vector<double> &lowErrorBars, vector<double> &highErrorBars)
+void Read(char* filename, ifstream& inputFile, string* araLineArray, vector<double> &fitnessScores, int individualCounter, double scaleFactor, double* antennaOuterRadii, int NSEEDS, vector<double> &vEffList, vector<double> &lowErrorBars, vector<double> &highErrorBars, double GeoScaleFactor)
 {
 	string txt = filename;
-	double GeoScaleFactor = 2; // Scales the geometric constraint 
+	//double GeoScaleFactor = 2; // Scales the geometric constraint 
+	// ^moved to be defined in the main function
+	double RadiusConstraint = 7.5; //7.5; // Size fo the borehole, so fitness scores of antennas above this are reduced
+
 	double sumvEff=0.;
 	double sumSquareLowError=0.;
 	double sumSquareHighError=0.;
@@ -189,12 +196,19 @@ void Read(char* filename, ifstream& inputFile, string* araLineArray, vector<doub
 	    } // if the file is there
 	} // end loop over seeds
         double vEff=sumvEff/(double)NSEEDS;
-	cout << vEff << endl;
+	cout <<"Veff: " <<  vEff << endl;
 	vEffList[individualCounter-1] = vEff;
-	if(antennaOuterRadii[individualCounter-1] >= (12.7/GeoScaleFactor)){
-	  fitnessScores[individualCounter-1] = (vEff)*exp(-pow(scaleFactor*(antennaOuterRadii[individualCounter-1]-(12.7/GeoScaleFactor))/(12.7/GeoScaleFactor),2));
+	cout << "Constraint value is: " << (RadiusConstraint/GeoScaleFactor) << endl;
+	cout << "Outer Radius is: " << antennaOuterRadii[individualCounter-1] << endl;
+	if(antennaOuterRadii[individualCounter-1] >= (RadiusConstraint/GeoScaleFactor)){
+	  cout<< "Constraint Applied" << endl;
+	  fitnessScores[individualCounter-1] = (vEff)*exp(-pow(scaleFactor*(antennaOuterRadii[individualCounter-1]-(RadiusConstraint/GeoScaleFactor))/(1),2));
+	  cout << "Factor Applied: " << exp(-pow(scaleFactor*(antennaOuterRadii[individualCounter-1]-(RadiusConstraint/GeoScaleFactor))/(1),2)) << endl;
+	  cout << "FS reduced to: " << fitnessScores[individualCounter-1] << endl;
 	}else{
+	  cout << "Constraint Not Applied" << endl;
 	  fitnessScores[individualCounter-1] = (vEff);
+	  cout << "FS should equal Veff: " << fitnessScores[individualCounter-1] << endl;
 	}
 
 	double lowErrorBar = sqrt(sumSquareLowError)/(double)NSEEDS;

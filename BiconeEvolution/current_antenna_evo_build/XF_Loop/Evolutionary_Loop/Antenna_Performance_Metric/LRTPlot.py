@@ -20,6 +20,7 @@ parser.add_argument("source", help="Name of source folder from home directory", 
 parser.add_argument("destination", help="Name of destination folder from home directory", type=str)
 parser.add_argument("numGens", help="Number of generations the code is running for", type=int)
 parser.add_argument("NPOP", help="Number of individuals in a population", type=int)
+parser.add_argument("GeoScalingFactor", help="The number by which we are scaling the antenna dimensions", type=int)
 g = parser.parse_args()
 
 # The name of the plot that will be put into the destination folder, g.destination
@@ -27,7 +28,6 @@ PlotName = "LRTPlot2D"
 
 
 #----------DEFINITIONS HERE----------DEFINITIONS HERE----------DEFINITIONS HERE----------DEFINITIONS HERE
-
 #----------STARTS HERE----------STARTS HERE----------STARTS HERE----------STARTS HERE 
 
 
@@ -78,7 +78,7 @@ lengthsArray = []
 templength = [] 
 for ind in range(g.NPOP):
     for l in range(0,len(allLengths),g.NPOP):
-        templength.append(allLengths[l+ind])
+        templength.append(g.GeoScalingFactor*allLengths[l+ind])
     lengthsArray.append(templength)
     templength = []
 
@@ -88,13 +88,16 @@ allRadii = runData[:,:, 0].flatten()
 
 radiiArray = []
 tempradii = []
+bigRadii = [] # for holding the big radius of each individual
+tempBigRadii = [] 
 for ind in range(g.NPOP):
     for l in range(0,len(allRadii),g.NPOP):
-            tempradii.append(allRadii[l+ind])
+            tempradii.append(g.GeoScalingFactor*allRadii[l+ind])
+            tempBigRadii.append(g.GeoScalingFactor*(allRadii[l+ind] + allLengths[l+ind]*np.tan(allThetas[l+ind]))) #I need to think about if this is the smartest way to populate this list -- Machtay 2/11/20
     radiiArray.append(tempradii)
     tempradii = []
-
-
+    bigRadii.append(tempBigRadii)
+    tempBigRadii = []
 
 # Create an array of every theta
 allThetas = runData[:, :, 2].flatten()
@@ -103,7 +106,7 @@ thetasArray = []
 tempthetas = []
 for ind in range(g.NPOP):
     for l in range(0,len(allThetas),g.NPOP):
-            tempthetas.append(allThetas[l+ind])
+            tempthetas.append(allThetas[l+ind]*180/np.pi)
     thetasArray.append(tempthetas)
     tempthetas = []
 
@@ -122,15 +125,29 @@ for ind in range(g.NPOP):
     axT.plot(thetasArray[ind], marker = 'o', label = LabelName, linestyle = '')
 
 # Labels:
-axL.set(xlabel='Generation', ylabel = 'Length [cm]')
-axR.set(xlabel='Generation', ylabel = 'Radius [cm]')
-axT.set(xlabel='Generation', ylabel = 'Theta [Radians]')
+#Length subplot
+#axL.set(xlabel='Generation', ylabel = 'Length [cm]')
+axL.set_xlabel("Generation", size = 18)
+axL.set_ylabel("Length [cm]", size = 18)
+axL.set_title("Length over Generations (0 - {})".format(int(g.numGens-1)), size = 20)
 
-axL.set_title("Length over Generations (0 - {})".format(int(g.numGens-1)))
-axR.set_title("Radius over Generations (0 - {})".format(int(g.numGens-1)))
-axT.set_title("Theta over Generations (0 - {})".format(int(g.numGens-1)))
+#Radius subplot
+#axR.set(xlabel='Generation', ylabel = 'Radius [cm]')
+axR.set_xlabel("Generation", size = 18)
+axR.set_ylabel("Radius [cm]", size = 18)
+axR.set_title("Radius over Generations (0 - {})".format(int(g.numGens-1)), size = 20)
 
+#Theta subplot
+#axT.set(xlabel='Generation', ylabel = 'Theta [Degrees]')
+axT.set_xlabel("Generation", size = 18)
+axT.set_ylabel("Theta [Degrees]", size = 18)
+axT.set_title("Theta over Generations (0 - {})".format(int(g.numGens-1)), size = 20)
 
+#axL.set_title("Length over Generations (0 - {})".format(int(g.numGens-1)))
+#axR.set_title("Radius over Generations (0 - {})".format(int(g.numGens-1)))
+#axT.set_title("Theta over Generations (0 - {})".format(int(g.numGens-1)))
+
+#Set the legends
 axL.legend()
 axR.legend()
 axT.legend()
@@ -139,5 +156,9 @@ plt.savefig(g.destination + "/" + PlotName)
 plt.show(block=False)
 plt.pause(15)
 
-
-
+fig = plt.figure(figsize = (10, 8))
+for i in range(g.NPOP):
+    LabelName = "Individual {}".format(ind+1)
+    plt.plot(bigRadii[ind], marker = 'o', label = LabelName, linestyle = '')
+plt.set(xlabel = 'Generation', ylabel = 'Outer Radius [cm]')
+plt.savefig(g.destination + "/" + "Outer Radii")
