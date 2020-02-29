@@ -88,13 +88,13 @@ void tournament(vector<vector<vector<float>>> &varInput, vector<vector<vector<fl
 // Machtay 2/21/20: I am moving some of the global variables into the main function
 // I'll leave the things I am moving into main commented out here for now in case we need to undo it
 
-const double MINIMUM_FREQUENCY = 0.08333; // This global constant defines the minimum frequency of the range we're working in, in GHz; Initial value is what AraSim uses
+double MINIMUM_FREQUENCY = 0.08333; // This global constant defines the minimum frequency of the range we're working in, in GHz; Initial value is what AraSim uses
 //MINIMUM_FREQUENCY = MINIMUM_FREQUENCY*MULTIPLIER_FACTOR
 
-const double MAXIMUM_FREQUENCY = 1.0667; // This global constant defines the maximum frequency of the range we're working in, in GHz; Initial value is what AraSim uses
+double MAXIMUM_FREQUENCY = 1.0667; // This global constant defines the maximum frequency of the range we're working in, in GHz; Initial value is what AraSim uses
 //MAXIMUM_FREQUENCY = MAXIMUM_FREQUENCY*MULTIPLIER_FACTOR
 
-const double FREQ_STEP = 0.01667; // This global constant defines the step size between frequencies as we scan.
+double FREQ_STEP = 0.01667; // This global constant defines the step size between frequencies as we scan.
 //FREQ_STEP = FREQ_STEP*MULTIPLIER_FACTOR
 
 
@@ -314,7 +314,7 @@ int main(int argc, char const *argv[])
 	
 	cout << "Roulette algorithm initialized." << endl;
 	
-    	if(argc != 3)
+    	if(argc != 4)
         {cout << "Error: Usage. Specify start or cont, as well as NPOP (EX: start 10)." << endl;}
     	else
     	{

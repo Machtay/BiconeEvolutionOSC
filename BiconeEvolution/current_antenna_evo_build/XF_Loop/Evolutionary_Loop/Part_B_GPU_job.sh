@@ -160,17 +160,9 @@ module load xfdtd
 module load cuda
 xfdtd $XFProj --execute-macro-script=$XmacrosDir/simulation_PEC.xmacro --splash=false || true
 
-if [ $m -lt 10 ]
-then
-	cd $XFProj/Simulations/00000$m/Run0001/
-	#xfsolver -t=35 -v #--use-xstream #xstream
-	xfsolver --use-xstream=true --xstream-use-number=1 --num-threads=1 -v
-elif [ $m -ge 10 ]
-then
-	cd $XFProj/Simulations/0000$m/Run0001/
-	#xfsolver -t=35 -v #--use-xstream #xstream
-	xfsolver --use-xstream=true --xstream-use-number=1 --num-threads=1 -v
-fi
+## Here is where we need to submit the GPU job
+
+./GPU_XF_Job.sh $WorkingDir $RunName $XmacrosDir $XFProj $m
 
 cd $WorkingDir
 	

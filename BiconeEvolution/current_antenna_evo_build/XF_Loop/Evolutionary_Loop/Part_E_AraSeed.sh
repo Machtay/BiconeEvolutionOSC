@@ -20,6 +20,7 @@ ScaleFactor=$5
 AntennaRadii=$6
 indiv=$7
 Seeds=$8
+GeoFactor=$9
 
 #chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
 
@@ -36,7 +37,7 @@ do
     InputFiles="${InputFiles}AraOut_${i}.txt "
 done
 
-./fitnessFunction_AraSeed.exe $NPOP $Seeds $ScaleFactor $AntennaRadii/generationDNA.csv $InputFiles #Here's where we add the flags for the generation
+./fitnessFunction_AraSeed.exe $NPOP $Seeds $ScaleFactor $AntennaRadii/generationDNA.csv $GeoFactor $InputFiles #Here's where we add the flags for the generation
 cp fitnessScores.csv "$WorkingDir"/Run_Outputs/$RunName/${gen}_fitnessScores.csv
 mv fitnessScores.csv "$WorkingDir"
 
@@ -64,7 +65,7 @@ python gensData.py $gen
 cd Antenna_Performance_Metric
 next_gen=$((gen+1))
 #python LRPlot.py "$WorkingDir" "$WorkingDir"/Run_Outputs/$RunName $[gen+1] $NPOP
-python LRTPlot.py "$WorkingDir" "$WorkingDir"/Run_Outputs/$RunName $next_gen $NPOP
+python LRTPlot.py "$WorkingDir" "$WorkingDir"/Run_Outputs/$RunName $next_gen $NPOP $GeoFactor
 cd ..
 # Note: gensData.py floats around in the main dir until it is moved to 
 # Antenna_Performance_Metric

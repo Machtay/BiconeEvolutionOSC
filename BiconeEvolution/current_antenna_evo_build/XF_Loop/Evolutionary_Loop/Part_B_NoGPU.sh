@@ -36,8 +36,6 @@ freqlist="8333 10000 11667 13333 15000 16767 18334 20000 21667 23334 25000 26667
 #The list of frequencies, scaled up by 100 to avoid float operation errors in bash
 #we have to wait to change the frequencies since we're going to be changing them as we append them to simulation_PEC.xmacro (which is removed below before being remade)
 
-done
-
 # First, remove the old .xmacro files
 #when do that, we end up making the files only readable; we should just overwrite them
 #alternatively, we can just set them as rwe when the script makes them
@@ -56,8 +54,7 @@ echo "var m = $m;" >> output.xmacro
 echo "var NPOP = $NPOP;" >> output.xmacro
 cat outputmacroskeleton_prototype.txt >> output.xmacro
 
-sed "s+fileDirectory+${WorkingDir}+" output.xmacro
-# When we use the sed command, anything can be the delimiter between each of the arguments; usually, we use /, but since there are / in the thing we are trying to substitute in ($WorkingDir), we need to use a different delimiter that doesn't appear there
+sed -i "s+fileDirectory+${WorkingDir}+" output.xmacro
 
 # Building the simulation_PEC.xmacro is a bit simpler. Cat the first skeleton, add the gridsize from datasize.txt, and cat the second skeleton
 
@@ -134,7 +131,7 @@ cat simulationPECmacroskeleton2_prototype.txt >> simulation_PEC.xmacro
 
 initial_gridsize=0.1
 new_gridsize=$(bc <<< "scale=6; $initial_gridsize/$GeoFactor")
-sed -i "s/var gridSize = 0.1;/var gridSize = $new_gridsize;" simulation_PEC.xmacro
+sed -i "s/var gridSize = 0.1;/var gridSize = $new_gridsize;/" simulation_PEC.xmacro
 
 sed -i "s+fileDirectory+${WorkingDir}+" simulation_PEC.xmacro
 #the above sed command substitute for hardcoded words and don't use a dummy file
@@ -157,24 +154,24 @@ echo '3. Close XF'
 #read -p "Press any key to continue... " -n1 -s
 
 module load xfdtd
-module load cuda
-xfdtd $XFProj --execute-macro-script=$XmacrosDir/simulation_PEC.xmacro --splash=false || true
+#module load cuda
+xfdtd $XFProj --execute-macro-script=$XmacrosDir/simulation_PEC.xmacro || true
 
 if [ $m -lt 10 ]
 then
 	cd $XFProj/Simulations/00000$m/Run0001/
-	#xfsolver -t=35 -v #--use-xstream #xstream
-	xfsolver --use-xstream=true --xstream-use-number=1 --num-threads=1 -v
+	xfsolver -t=35 -v #--use-xstream #xstream
+	#xfsolver --use-xstream=true --xstream-use-number=1 --num-threads=1 -v
 elif [ $m -ge 10 ]
 then
 	cd $XFProj/Simulations/0000$m/Run0001/
-	#xfsolver -t=35 -v #--use-xstream #xstream
-	xfsolver --use-xstream=true --xstream-use-number=1 --num-threads=1 -v
+	xfsolver -t=35 -v #--use-xstream #xstream
+	#xfsolver --use-xstream=true --xstream-use-number=1 --num-threads=1 -v
 fi
 
 cd $WorkingDir
 	
-xfdtd $XFProj --execute-macro-script=$XmacrosDir/output.xmacro || true --splash=false
+xfdtd $XFProj --execute-macro-script=$XmacrosDir/output.xmacro || true 
 
 cd $WorkingDir/Antenna_Performance_Metric
 for freq in `seq 1 60`

@@ -31,23 +31,11 @@ exp=18				   ## exponent of the energy for the neutrinos in AraSim
 ScaleFactor=1.0                    ## ScaleFactor used when punishing fitness scores of antennae larger than the drilling holes
 GeoFactor=2 			   ## This is the number by which we are scaling DOWN our antennas. This is passed to many files
 
-###########################New variables we need to pass ################
-# To do this will involve changing the roulette algorithm somewhat drastically. I'll work on this in the meeting on 2/21/20 --Machtay
-# The below variables are passed to the roulette algorithm to be used as the properties of the gaussians which generate the antennas
-# Antenna Dimensions and their standard deviations (passed to roulette algorithm)
-# Antenna_length = # the mean length of the antennas
-# Antenna_length_std = # the standard deviation of the length of the antennas
-# Antenna_radius = # the mean radius of the antennas
-# Antenna_radius_std = # the standard deviation of the radius of the antennas
-# Antenna_angle = # the opening angle of the bicone
-# Antenna_angle_std = # the standard deviation of the opening angle of the bicone
-# Setting these in the bash script means we need to recompile the roulette algorithm every time we run
-
 #####################################################################################################################################################
 
 ########  Initialization of variables  ###############################################################################################################
 BEOSC=/fs/project/PAS0654/BiconeEvolutionOSC
-WorkingDir=`pwd` #this is /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop
+WorkingDir=`pwd` ## this is where the loop is; on OSC this is /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build_XF_Loop/Evolutionary_Loop
 echo $WorkingDir
 XmacrosDir=$WorkingDir/../Xmacros
 XFProj=$WorkingDir/Run_Outputs/${RunName}/${RunName}.xf  ## Provide path to the project directory in the 'single quotes'
@@ -61,6 +49,7 @@ source /fs/project/PAS0654/BiconeEvolutionOSC/araenv.sh
 ##Check if saveState exists and if not then create one at 0,0
 saveStateFile="${RunName}.savestate.txt"
 
+## We have a savestate that allows us to pick back up if we interrupt the loop ##
 echo "${saveStateFile}"
 cd saveStates
 if ! [ -f "${saveStateFile}" ]; then
@@ -80,26 +69,19 @@ indiv=0
 while read p; do
 	if [ $line -eq 1 ]
 	then
-		InitialGen=$p
-		#echo "${p}"
-		#echo "${InitialGen}"
-	       
+		InitialGen=$p 
 
 	fi
 	
 	if [ $line -eq 2 ]
 	then
 		state=$p
-		#echo "${p}"
-		#echo "${state}"
 	        
 	fi
 	
 	if [ $line -eq 3 ]
 	then
 	        indiv=$p
-		#echo "${p}"
-		#echo "${indiv}"
 		
 	fi
 	
@@ -117,7 +99,7 @@ while read p; do
 
        
 	
-done <saveStates/$saveStateFile
+done <saveStates/$saveStateFile ## this outputs to the state of the loop to the savestate file
 
 
 
