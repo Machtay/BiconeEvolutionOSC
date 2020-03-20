@@ -170,27 +170,21 @@ const float CONVERGENCE = 0.00; // Our convergence threshold. If the standard de
 
 // Gene One, Gene One controls radius currently
 
-float INITIAL_MEAN_C1_G1 = 1.5f;// / MULTIPLIER_FACTOR ; // When we initially run, this is the average value seeded for the gene.
-//The multiplier factor is commented out above to test if this is causing our problem 1/27/20
-//INITIAL_MEAN_C1_G1 = INITIAL_MEAN_C1_G1 / MULTIPLIER_FACTOR
+float INITIAL_MEAN_C1_G1 = 1.5f;
 
-float INITIAL_STD_DVN_C1_G1 = 0.75f; // / MULTIPLIER_FACTOR; //1.0; // When starting a new generation, this is the starting variance for the gene.
-//INITIAL_STD_DVN_C1_G1 = INITIAL_STD_DVN_C1_G1 / MULTIPLIER_FACTOR
+float INITIAL_STD_DVN_C1_G1 = 0.75f; 
 
 // Gene Two, Gene two controls length currently 
 
-float INITIAL_MEAN_C1_G2 = 50.0f; // / MULTIPLIER_FACTOR;//50.0f; // When we initially run, this is the average value seeded for the gene.
-//INITIAL_MEAN_C1_G2 = INITIAL_MEAN_C1_G2 / MULTIPLIER_FACTOR
+float INITIAL_MEAN_C1_G2 = 50.0f; 
 
-float INITIAL_STD_DVN_C1_G2 = 15.0f; // / MULTIPLIER_FACTOR;//15.0f; // When starting a new generation, this is the starting variance for the gene.
-//INITIAL_STD_DVN_C1_G2 = INITIAL_STD_DVN_C1_G2 / MULTIPLIER_FACTOR
-
+float INITIAL_STD_DVN_C1_G2 = 15.0f; 
 
 // Gene Three, Gene three controls angle (in radians) currently 
 
-const float INITIAL_MEAN_C1_G3 = M_PI / 12;//8; // When we initially run, this is the average value seeded for the gene.
+const float INITIAL_MEAN_C1_G3 = M_PI / 12;
 
-const float INITIAL_STD_DVN_C1_G3 = M_PI / 36;//8; // When starting a new generation, this is the starting variance for the gene.
+const float INITIAL_STD_DVN_C1_G3 = M_PI / 36;
 
 // All other genes are currently unused
 const float INITIAL_MEAN_CX_GY = 0.0f;

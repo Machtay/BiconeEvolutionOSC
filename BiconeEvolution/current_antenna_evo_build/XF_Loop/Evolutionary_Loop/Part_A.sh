@@ -22,7 +22,7 @@ GeoFactor=$5
 
 #chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
 
-cd "$WorkingDir"
+cd $WorkingDir
 if [ $gen -eq 0 ]
 then
 	

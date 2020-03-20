@@ -1,12 +1,17 @@
-var m = 1;
 var NPOP = 10;
-//Factor of 2 frequency
-var freq = [166.66, 200.00, 233.34, 266.66, 300.00, 335.34, 366.68, 400.00, 433.34, 466.68, 500.00, 533.34, 566.68, 600.00, 633.34, 666.66, 700.00, 735.34, 766.68, 800.02, 833.34, 866.66, 900.02, 935.34, 966.68, 1000.02, 1033.36, 1066.68, 1100.02, 1135.36, 1166.68, 1200.02, 1233.36, 1266.68, 1300.02, 1335.36, 1366.68, 1400.02, 1433.34, 1466.68, 1500.02, 1535.36, 1566.68, 1600.02, 1633.36, 1666.70, 1700.04, 1733.36, 1766.70, 1800.04, 1833.36, 1866.70, 1900.04, 1933.36, 1966.70, 2000.00, 2033.40, 2066.80, 2100.00, 2133.40] 
-App.saveCurrentProjectAs("/fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Run_Outputs/Patton_2_25_2020_7/Patton_2_25_2020_7");
+var indiv = 1;
+//Factor of 1 frequency
+var freq = [83.33, 100.00, 116.67, 133.33, 150.00, 167.67, 183.34, 200.00, 216.67, 233.34, 250.00, 266.67, 283.34, 300.00, 316.67, 333.33, 350.00, 367.67, 383.34, 400.01, 416.67, 433.33, 450.01, 467.67, 483.34, 500.01, 516.68, 533.34, 550.01, 567.68, 583.34, 600.01, 616.68, 633.34, 650.01, 667.68, 683.34, 700.01, 716.67, 733.34, 750.01, 767.68, 783.34, 800.01, 816.68, 833.35, 850.02, 866.68, 883.35, 900.02, 916.68, 933.35, 950.02, 966.68, 983.35, 1000.00, 1016.70, 1033.40, 1050.00, 1066.70] 
+if(indiv==1){
+App.saveCurrentProjectAs("/fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Run_Outputs/Machtay_3_20_20_2/Machtay_3_20_20_2");
+}
 var path = "/fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/generationDNA.csv";
 
 //Factor of 1 frequency
 //var freq = [83.33, 100.00, 116.67, 133.33, 150.00, 167.67, 183.34, 200.00, 216.67, 233.34, 250.00, 266.67, 283.34, 300.00, 316.67, 333.33, 350.00, 367.67, 383.34, 400.01, 416.67, 433.33, 450.01, 467.67, 483.34, 500.01, 516.68, 533.34, 550.01, 567.68, 583.34, 600.01, 616.68, 633.34, 650.01, 667.68, 683.34, 700.01, 716.67, 733.34, 750.01, 767.68, 783.34, 800.01, 816.68, 833.35, 850.02, 866.68, 883.35, 900.02, 916.68, 933.35, 950.02, 966.68, 983.35, 1000.00, 1016.70, 1033.40, 1050.00, 1066.70]
+
+for(var j = 1;j<=NPOP;j++){
+var m = j;
 
 var freqCoefficients = 60 // This stores how many frequencies we're working with.
 var headerLines = 7 // This is how many lines come before the frequency data
@@ -18,7 +23,7 @@ var radii=[];
 var lengths=[];
 var angles=[];
 var units = " cm";
-var gridSize = .050000;
+var gridSize = .100000;
 
 // This macro imports data from generationDNA.csv to XF.
 // It then generates simulations.
@@ -60,7 +65,7 @@ for(var i = 0;i < NPOP;i++)
         	QueueSimulation();
 	}
 }
-
+}
 function CreateAntenna(i)
 {
 	App.getActiveProject().getGeometryAssembly().clear();

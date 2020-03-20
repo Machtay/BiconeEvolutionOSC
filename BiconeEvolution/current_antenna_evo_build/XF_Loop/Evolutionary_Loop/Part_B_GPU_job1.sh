@@ -25,16 +25,12 @@ RunName=$5
 XmacrosDir=$6
 XFProj=$7
 GeoFactor=$8
+num_keys=$9
 
-module load cuda
-
+chmod -R 777 $XmacrosDir
 
 #chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
-
-## Lines for output.xmacro files ##
-line1='var query = new ResultQuery();'
-line2='///////////////////////Get Theta and Phi Gain///////////////'
-line3='query.projectId = App.getActiveProject().getProjectDirectory();'
+cd $XmacrosDir
 freqlist="8333 10000 11667 13333 15000 16767 18334 20000 21667 23334 25000 26667 28334 30000 31667 33333 35000 36767 38334 40001 41667 43333 45001 46767 48334 50001 51668 53334 55001 56768 58334 60001 61668 63334 65001 66768 68334 70001 71667 73334 75001 76768 78334 80001 81668 83335 85002 86668 88335 90002 91668 93335 95002 96668 98335 100000 101670 103340 105000 106670"
 #The list of frequencies, scaled up by 100 to avoid float operation errors in bash
 #we have to wait to change the frequencies since we're going to be changing them as we append them to simulation_PEC.xmacro (which is removed below before being remade)
@@ -43,7 +39,8 @@ freqlist="8333 10000 11667 13333 15000 16767 18334 20000 21667 23334 25000 26667
 rm simulation_PEC.xmacro
 
 #echo "var m = $j;" >> simulation_PEC.xmacro
-echo "var NPOP = $NPOP;" >> simulation_PEC.xmacro
+echo "var NPOP = $NPOP;" > simulation_PEC.xmacro
+echo "var indiv = $indiv;" >> simulation_PEC.xmacro
 #now we can write the frequencies to simulation_PEC.xmacro
 #now let's change our frequencies by the scale factor (and then back down by 100)
 
@@ -89,17 +86,19 @@ done
 
 ###
 
-if [[ $gen -eq 0 && $i -eq 1 ]]
+if [[ $gen -eq 0 && $indiv -eq 1 ]]
 then
-	echo "App.saveCurrentProjectAs(\"$WorkingDir/Run_Outputs/$RunName/$RunName\");" >> simulation_PEC.xmacro
+    echo "if(indiv==1){" >> simulation_PEC.xmacro	
+    echo "App.saveCurrentProjectAs(\"$WorkingDir/Run_Outputs/$RunName/$RunName\");" >> simulation_PEC.xmacro
+    echo "}" >> simulation_PEC.xmacro
 fi
 
 #we cat things into the simulation_PEC.xmacro file, so we can just echo the list to it before catting other files
 
-cat simulationPECmacroskeleton_prototype_GPU.txt >> simulation_PEC.xmacro 
-cd $WorkingDir
+#cd $XmacrosDir
+cat simulationPECmacroskeleton_GPU.txt >> simulation_PEC.xmacro 
 
-cat simulationPECmacroskeleton2_prototype_GPU.txt >> simulation_PEC.xmacro
+cat simulationPECmacroskeleton2_GPU.txt >> simulation_PEC.xmacro
 
 #we need to change the gridsize by the same factor as the antenna size
 #the gridsize in the macro skeleton is currently set to 0.1
@@ -131,61 +130,73 @@ echo '3. Close XF'
 
 module load xfdtd
 
-xfdtd $XFProj --execute-macro-script=$XmacrosDir/simulation_PEC.xmacro --splash=false || true &
+xfdtd $XFProj --execute-macro-script=$XmacrosDir/simulation_PEC.xmacro || true 
 
 
 
 ## Here is where we need to submit the GPU job
+## we want to make this loop over each individual and send each job for fewer minutes
+cd $WorkingDir
+#qsub -l nodes=1:ppn=40:gpus=1:default -l walltime=0:15:00 -A PAS0654 -v WorkingDir=$WorkingDir,RunName=$RunName,XmacrosDir=$XmacrosDir,XFProj=$XFProj,NPOP=$NPOP,indiv=$indiv GPU_XF_Job.sh 
 
-qsub -l nodes=1:ppn=28:gpus=1:default -l walltime=1:00:00 -A PAS0654 -v $WorkingDir,$RunName,$XmacrosDir $XFProj,$NPOP,$indiv GPU_XF_Job.sh 
+### End Part B1 ###
 
+### JK! Here's another way of submitting the jobs so that we can give each individual to one job! ###
 
-cd $WorkingDir/Run_Outputs/$RunName/GPUFlags/
+#
+#
+#
+#
+#
+
+mkdir -m777 $WorkingDir/Run_Outputs/$RunName/GPUFlags
+
+for m in `seq 1 $num_keys`
+do
+
+	#we are going to make the walltime a variable based on the size of the antenna
 	
-#we need to check if the file at the end of the GPU job has been made before continuing the loop
-rm -f $WorkingDir/Run_Outputs/$RunName/GPUFlags/*
-flag_files=0
-while [ "$flag_files" != "1" ]
-do
 
-	echo "Waiting for GPU jobs to finished..."
-	sleep 60
-	flag_files=$(ls -l --files-type | grep -v '/$' | wc -l)
+	indiv_dir=$XFProj/Simulations/00000$m/Run0001/
+	qsub -l nodes=1:ppn=35:gpus=1:default -l walltime=1:00:00 -A PAS0654 -v WorkingDir=$WorkingDir,RunName=$RunName,XmacrosDir=$XmacrosDir,XFProj=$XFProj,NPOP=$NPOP,indiv=$m,indiv_dir=$indiv_dir,m=$m GPU_XF_Job.sh ## Here's our job that will do the xfsolver
 
 done
 
-echo "Done!"
+#for m in `seq $indiv $NPOP`
+#do
+#	if [ $m -lt 10 ]
+#	then
+#		indiv_dir=$XFProj/Simulations/00000$m/Run0001/
+#		qsub -l nodes=1:ppn=32:gpus=1:default -l walltime=0:20:00 -A PAS0654 -v WorkingDir=$WorkingDir,RunName=$RunName,XmacrosDir=$XmacrosDir,XFProj=$XFProj,NPOP=$NPOP,indiv=$indiv,indiv_dir=$indiv_dir,m=$m GPU_XF_Job.sh ## Here's our job that will do the xfsolver
+#	elif [[ $m -ge 10  &&  $m -lt 100 ]]
+#	then
+#		indiv_dir=$XFProj/Simulations/0000$m/Run0001/
+#		qsub -l nodes=1:ppn=32:gpus=1:default -l walltime=0:20:00 -A PAS0654 -v WorkingDir=$WorkingDir,RunName=$RunName,XmacrosDir=$XmacrosDir,XFProj=$XFProj,NPOP=$NPOP,indiv=$indiv,indiv_dir=$indiv_dir,m=$m GPU_XF_Job.sh ## Here's our job that will do the xfsolver
+#		xfsolver --use-xstream=true --xstream-use-number=1 --num-threads=1 -v
+#	elif [ $m -ge 100 ]
+#	then
+#		indiv_dir=$XFProj/Simulations/000$m/Run0001/
+#		qsub -l nodes=1:ppn=32:gpus=1:default -l walltime=0:20:00 -A PAS0654 -v WorkingDir=$WorkingDir,RunName=$RunName,XmacrosDir=$XmacrosDir,XFProj=$XFProj,NPOP=$NPOP,indiv=$indiv,indiv_dir=$indiv_dir,m=$m GPU_XF_Job.sh ## Here's our job that will do the xfsolver
+#		xfsolver --use-xstream=true --xstream-use-number=1 --num-threads=1 -v
+#  	fi
+#done
 
-# First, remove the old .xmacro files
-#when do that, we end up making the files only readable; we should just overwrite them
-#alternatively, we can just set them as rwe when the script makes them
-cd $XmacrosDir
- 
-rm output.xmacro
-
-# NEW WAY
-#(using the single > over >> overwrites instead of appending)
-echo "$line1" > output.xmacro
-echo "$line2" >> output.xmacro
-echo "$line3" >> output.xmacro
-#echo "var m = $i;" >> output.xmacro
-echo "var NPOP = $NPOP;" >> output.xmacro
-cat outputmacroskeleton_prototype_GPU.txt >> output.xmacro
-
-sed -i "s+fileDirectory+${WorkingDir}+" output.xmacro
-# When we use the sed command, anything can be the delimiter between each of the arguments; usually, we use /, but since there are / in the thing we are trying to substitute in ($WorkingDir), we need to use a different delimiter that doesn't appear there
-
-xfdtd $XFProj --execute-macro-script=$XmacrosDir/output.xmacro || true --splash=false
-
-cd $WorkingDir/Antenna_Performance_Metric
-for freq in `seq 1 60`
-do
-  #Remove if plotting software doesnt need
-  #cp data/$i.uan ${i}uan.csv
-	mv ${m}_${freq}.uan "$WorkingDir"/Run_Outputs/$RunName/${gen}_${m}_${freq}.uan
-done
-
-
-
-#chmod -R 777 /fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
 
