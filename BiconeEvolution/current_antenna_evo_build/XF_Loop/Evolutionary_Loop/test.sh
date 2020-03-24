@@ -1,14 +1,13 @@
-RunName='Julie_12_2'           ## Replace when needed                                                                 
-TotalGens=6                     ## number of generations (after initial) to run through                                
+RunName='Rolla_halfscalefactor'           ## Replace when needed                                                                 
+TotalGens=1                     ## number of generations (after initial) to run through                                
 WorkingDir=`pwd` 
 NPOP=2                          ## number of individuals per generation; please keep this value below 99                
-FREQ=60                         ## frequencies being iterated over in XF (Currectly only affects the output.xmacro loop\
+FREQ=1                         ## frequencies being iterated over in XF (Currectly only affects the output.xmacro loop\
                                                                                                                        
 NNT=10000                          ##Number of Neutrinos Thrown in AraSim                                               
 ScaleFactor=1.0                   ##ScaleFactor used when punishing fitness scores of antennae larger than holes used i\
 
-AntennaRadii=/fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Lo\
-op/Run_Outputs/${RunName}
+AntennaRadii=/fs/project/PAS0654/BiconeEvolutionOSC/BiconeEvolution/current_antenna_evo_build/XF_Loop/Evolutionary_Loop/Run_Outputs/${RunName}
 
 
 
@@ -21,10 +20,18 @@ op/Run_Outputs/${RunName}
     #    done
 
 
-     #   ./fitnessFunction.exe $NPOP $ScaleFactor $WorkingDir/generationDNA.csv $InputFiles
+./fitnessFunction_Araseed.exe $NPOP $ScaleFactor $WorkingDir/4_generationDNA.csv $InputFiles
 #cd "$WorkingDir"
 # rm runData.csv
 #python gensData.py 1
 cd Antenna_Performance_Metric
 #python LRPlot.py "$WorkingDir" "$WorkingDir"/Run_Outputs/$RunName 1 $NPOP
-python LRTPlot.py "$WorkingDir" "$WorkingDir"/Run_Outputs/$RunName 2 $NPOP  
+python LRTPlot.py "$WorkingDir"/Antenna_Performance_Metric "$WorkingDir"/Run_Outputs/$RunName $TotalGens $NPOP  
+#python FScorePlot.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $TotalGens
+#python Veff_Plotting.py "$WorkingDir"/Run_Outputs/$RunName "$WorkingDir"/Run_Outputs/$RunName $TotalGens $NPOP    
+#python leogaintest.py $NPOP
+#python gain_match_2.py $NPOP
+#gen=2
+#indiv=1
+#python XFintoARA.py $NPOP $WorkingDir $RunName $gen $indiv
+#python XFintoARA.py $NPOP

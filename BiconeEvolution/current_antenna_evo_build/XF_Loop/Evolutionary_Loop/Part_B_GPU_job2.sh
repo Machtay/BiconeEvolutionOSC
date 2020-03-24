@@ -69,7 +69,7 @@ do
 		next_jobs=$(echo $flag_files+$num_keys-1 | bc)
 	#we need to account for the fact that sometimes we have fewer jobs than keys; it's bad to oversend jobs
 	else
-		next_jobs=$(echo $totPop-$flag_files | bc)
+		next_jobs=$(echo $totPop-1 | bc)
 	fi
 
 	for m in `seq $flag_files $next_jobs`
